@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "attendance-app",
+    "slug": "aktivai",
+    "version": "1.0.0",
+    "scheme": "aktivai",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.sharimin.aktivai",
+      "versionCode": 1
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+    ,
+    "extra": {
+      "eas": {
+        "projectId": "7643db72-0717-47bb-9d04-e64656c21fe1"
+      }
+  }
+}
+}
+
