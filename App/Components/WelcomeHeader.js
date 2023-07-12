@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet } from 'react-native'
+import { View, Text, Image, StyleSheet } from 'react-native-web'
 import React, { useContext } from 'react'
 import { AuthContext } from '../Context/AuthContext'
 

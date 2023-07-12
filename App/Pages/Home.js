@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native-web';
 import { useNavigation } from '@react-navigation/native';
 import Colors from '../Shared/Colors';
 import { AuthContext } from '../Context/AuthContext';

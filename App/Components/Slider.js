@@ -1,9 +1,9 @@
-import { View, Text } from 'react-native'
+import { View, Text } from 'react-native-web'
 import React, { useEffect, useState } from 'react'
-import GlobalApi from '../Shared/GlobalApi';
-import { FlatList } from 'react-native';
-import { Image } from 'react-native';
-import { Dimensions } from 'react-native';
+// import GlobalApi from '../Shared/GlobalApi';
+import { FlatList } from 'react-native-web';
+import { Image } from 'react-native-web';
+import { Dimensions } from 'react-native-web';
 
 export default function Slider() {
     const [slider,setSlider]=useState([])
@@ -11,17 +11,17 @@ export default function Slider() {
         getSlider();
       },[])
   
-      const getSlider=async()=>{
-        const result=(await GlobalApi.getSlider()).data;
+      // const getSlider=async()=>{
+      //   // const result=(await GlobalApi.getSlider()).data;
        
-        const resp=result.data.map((item)=>({
-            id:item.id,
-            name:item.attributes.name,
-            image:item.attributes.image.data.attributes.url
-        }))
+      //   // const resp=result.data.map((item)=>({
+      //   //     id:item.id,
+      //   //     name:item.attributes.name,
+      //   //     image:item.attributes.image.data.attributes.url
+      //   }))
        
-        setSlider(resp)
-      }
+      //   setSlider(resp)
+      // }
   return (
     <View style={{marginTop:10}}>
       <FlatList

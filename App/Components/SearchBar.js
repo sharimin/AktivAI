@@ -1,8 +1,8 @@
-import { View, Text, StyleSheet, Linking } from 'react-native'
+import { View, Text, StyleSheet, Linking } from 'react-native-web'
 import React, { useState } from 'react'
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../Shared/Colors';
-import { TextInput, TouchableOpacity } from 'react-native';
+import { TextInput, TouchableOpacity } from 'react-native-web';
 
 export default function SearchBar() {
   const [searchText, setSearchText] = useState('');

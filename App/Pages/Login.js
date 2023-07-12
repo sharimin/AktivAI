@@ -1,10 +1,10 @@
-import { View, Text, Image, StyleSheet } from 'react-native'
+import { View, Text, Image, StyleSheet } from 'react-native-web'
 import React, { useContext, useEffect, useState } from 'react'
 import Colors from '../Shared/Colors'
 import { Ionicons } from '@expo/vector-icons'; 
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity } from 'react-native-web';
 import { AuthContext } from '../Context/AuthContext';
 import Services from '../Shared/Services';
 //export const isAndroid = () => Platform.OS === 'android';
@@ -14,8 +14,10 @@ export default function Login() {
     const [userInfo,setUserInfo]=useState();
     const {userData,setUserData}=useContext(AuthContext);
     const [request, response, promptAsync] = Google.useAuthRequest({
-        androidClientId: '669317642456-26d1p0s0uk9d79qlts6qlm608jh8ti6k.apps.googleusercontent.com',
-        expoClientId:'669317642456-ro2uo5am9f5v32sh95nji40tuvu5r1e4.apps.googleusercontent.com'
+      webClientId: '669317642456-ro2uo5am9f5v32sh95nji40tuvu5r1e4.apps.googleusercontent.com',
+         androidClientId: '669317642456-26d1p0s0uk9d79qlts6qlm608jh8ti6k.apps.googleusercontent.com',
+         expoClientId:'669317642456-ro2uo5am9f5v32sh95nji40tuvu5r1e4.apps.googleusercontent.com'
+        
       });
 
       useEffect(()=>{
