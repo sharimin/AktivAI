@@ -7,13 +7,12 @@ export default function Hello() {
   return (
     <View style={styles.container}>
         <View>
-        <Text>Hello,</Text>
+        <Text>Hai,</Text>
             <Text style={{fontSize:20,fontWeight:'bold'}}>{userData?.name}</Text>
         </View>
         <Image source={{uri:userData?.picture}}
         style={{width:40,height:40,borderRadius:100}}
         />
-      
     </View>
   )
 }

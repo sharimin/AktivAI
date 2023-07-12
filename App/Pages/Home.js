@@ -8,6 +8,8 @@ import Slider from '../Components/Slider';
 import SearchBar from '../Components/SearchBar';
 import Scanner from '../Screens/Scanner';
 import Logout from './Logout';
+import Clock from './Clock';
+import DateComponent from './DateComponent';
 
 export default function Home() {
   const { userData, setUserData } = useContext(AuthContext);
@@ -19,6 +21,8 @@ export default function Home() {
         <WelcomeHeader />
         <SearchBar />
         <Slider />
+        <Clock/>
+        <DateComponent/>
       </View>
       <TouchableOpacity style={styles.scanButtonContainer} onPress={() => navigation.navigate('Scanner')}>
         <Image
@@ -26,6 +30,7 @@ export default function Home() {
           style={styles.buttonImage}
         />
       </TouchableOpacity>
+      
       <Logout />
     </View>
   );
