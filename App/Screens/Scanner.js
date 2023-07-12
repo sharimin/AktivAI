@@ -29,10 +29,12 @@ export default function Scanner() {
     return (
         <View style={styles.container}>
             <View style={styles.scannerContainer}>
-                <BarCodeScanner
-                    onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-                    style={StyleSheet.absoluteFillObject}
-                />
+                <View style={styles.scannerBorder}>
+                    <BarCodeScanner
+                        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+                        style={StyleSheet.absoluteFillObject}
+                    />
+                </View>
             </View>
             {scanned && (
                 <TouchableOpacity style={styles.button} onPress={() => setScanned(false)}>
@@ -51,6 +53,16 @@ const styles = StyleSheet.create({
     },
     scannerContainer: {
         flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    scannerBorder: {
+        borderWidth: 2,
+        borderColor: 'red',
+        borderRadius: 10,
+        overflow: 'hidden',
+        width: '80%',
+        aspectRatio: 1,
     },
     button: {
         marginTop: 16,
