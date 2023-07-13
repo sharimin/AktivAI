@@ -7,9 +7,13 @@ import Home from './App/Pages/Home';
 import Services from './App/Shared/Services';
 import { NavigationContainer } from '@react-navigation/native';
 import HomeNavigation from './App/Navigations/HomeNavigations';
+import Register from './App/Pages/Register';
+import LoginOp from './App/Pages/LoginOp';
+
 
 export default 
 function App() {
+  
   const [userData, setUserData] = useState();
 
   useEffect(() => {
@@ -39,6 +43,8 @@ function App() {
           <Login />
         )}
       </AuthContext.Provider>
+      <Register />
+      <LoginOp />
     </View>
   );
 }
