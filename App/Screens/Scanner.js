@@ -1,6 +1,6 @@
-import { View, Text, Button, StyleSheet, Linking, TouchableOpacity,BarCodeScanner } from 'npm install expo-barcode-scanner-web';
+import { View, Text, Button, StyleSheet, Linking, TouchableOpacity } from 'react-native-web';
 import React, { useEffect, useState } from 'react';
-//import { BarCodeScanner } from 'expo-barcode-scanner';
+import { BarCodeScanner } from 'expo-barcode-scanner';
 
 export default function Scanner() {
     const [hasPermission, setHasPermission] = useState(null);
