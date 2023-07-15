@@ -15,15 +15,17 @@ const Register = () => {
 
   const handleRegister = () => {
     
-    axios.post("http://localhost:3001/register", {
+    axios.post("http://localhost:5000//register", {
         email: email,
         username: username,
         password: password,
     }).then((response) => {
         if(response.data.message){
             setRegisterStatus(response.data.message);
+            console.log(response.data.message);
         }else{
             setRegisterStatus("ACCOUNT CREATED SUCCESSFULLY");
+            console.log('ACCOUNT CREATED SUCCESSFULLY');
         }
     })
     console.log('Registering with:', email, username, password);
