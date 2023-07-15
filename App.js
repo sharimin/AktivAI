@@ -43,8 +43,8 @@ function App() {
           <Login />
         )}
       </AuthContext.Provider>
-      {/* <Register />
-      <LoginOp /> */}
+      <Register />
+      <LoginOp />
     </View>
   );
 }
