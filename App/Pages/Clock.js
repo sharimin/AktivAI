@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native-web';
+import { View, Text, StyleSheet } from 'react-native';
 
 export default function Clock() {
   const [currentTime, setCurrentTime] = useState(new Date());

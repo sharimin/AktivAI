@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native-web';
+import { View, Text, StyleSheet } from 'react-native';
 
 export default function DateComponent() {
   const [currentDate, setCurrentDate] = useState(new Date());

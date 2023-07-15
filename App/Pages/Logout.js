@@ -1,4 +1,4 @@
-import { View, Button, Text, TouchableOpacity, StyleSheet } from 'react-native-web';
+import { View, Button, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import React, { useContext } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../Context/AuthContext';

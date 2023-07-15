@@ -1,4 +1,4 @@
-import { View, Text, Button, StyleSheet, Linking, TouchableOpacity } from 'react-native-web';
+import { View, Text, Button, StyleSheet, Linking, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 
