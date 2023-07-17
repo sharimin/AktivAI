@@ -9,8 +9,14 @@
     "rewrites": [
       {
         "source": "**",
-        "destination": "/index.html"
+        "function": "app"
       }
     ]
-  }
+  },
+  "functions": [
+    {
+      "source": "functions"
+      
+    }
+  ]
 }

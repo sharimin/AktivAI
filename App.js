@@ -40,7 +40,7 @@ function App() {
             <HomeNavigation />
           </NavigationContainer>
         ) : (
-          <Login />
+          <Register />
         )}
       </AuthContext.Provider>
       {/* <Register />
