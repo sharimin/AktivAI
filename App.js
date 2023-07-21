@@ -9,7 +9,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import HomeNavigation from './App/Navigations/HomeNavigations';
 import Register from './App/Pages/Register';
 import LoginOp from './App/Pages/LoginOp';
-
+import Success from './App/Pages/Success';
+import SuccessNavigation from './App/Navigations/SuccessNavigation';
+import RegisterNavigation from './App/Navigations/RegisterNavigation';
 
 export default 
 function App() {

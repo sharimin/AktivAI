@@ -2,33 +2,43 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native-web';
 import Colors from '../Shared/Colors';
 import axios from 'axios';
-
+import { isValidEmail, isValidDateOfBirth } from './Validation';
+import { NavigationContainer } from '@react-navigation/native';
+import SuccessNavigation from '../Navigations/SuccessNavigation';
 const Register = () => {
   const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
+  const [firstName, setFirstName] = useState('');
   const [password, setPassword] = useState('');
   const [profilePicture, setProfilePicture] = useState('');
-  const [ic, setIc] = useState('');
+  const [dob, setDob] = useState('');
   const [gender, setGender] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [universityEmail, setUniversityEmail] = useState('');
+  const [lastName, setLastName] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
   const [registerStatus, setRegisterStatus] = useState('');
-
+ 
   const handleRegister = () => {
-    if (!email || !username || !password || !gender || !phoneNumber) {
+    if (!email || !firstName || !lastName || !dob || !password || !gender || !phoneNumber) {
       setRegisterStatus('Please fill in all fields');
+      return;
+    }
+    if (!isValidEmail(email)) {
+      setRegisterStatus('Please enter a valid email address');
+      return;
+    }
+    if (!isValidDateOfBirth(dob)) {
+      setRegisterStatus('Please enter a valid date of birth in MM/DD/YYYY format');
       return;
     }
 
     // // Add form validation for email
-    // if (!email.includes('@')) {
+    //if (!email.includes('@')) {
     //   setRegisterStatus('Please enter a valid email address');
     //   return;
     // }
 
     // Add form validation for password
-    if (password.length < 8) {
+    if (password.length < 7) {
       setRegisterStatus('Password must be at least 8 characters long');
       return;
     }
@@ -41,23 +51,25 @@ const Register = () => {
 
     axios.post("https://aktivai.web.app/register", {
         email: email,
-        username: username,
+        first_name: firstName,
         password: password,
         profile_picture: profilePicture,
-        ic: ic,
+        dob: dob,
         gender: gender,
         phone_number: phoneNumber,
-        university_email: universityEmail,
+        last_name: lastName,
         wallet_address: walletAddress
     }).then((response) => {
         if(response.data.message){
             setRegisterStatus(response.data.message);
             console.log(response.data.message);
         }else{
-            setRegisterStatus("ACCOUNT CREATED SUCCESSFULLY");
-            setRegisterStatus("Thank you for choosing aktiv.io for your event management needs. We hope to see you around with us in the future at all of our upcoming events.");
-            navigation.navigate('Success')
-            console.log('ACCOUNT CREATED SUCCESSFULLY');
+            setRegisterStatus("BERJAYA CIPTA AKAUN");
+            setRegisterStatus("Terima kasih kerana menyertai AKTIVAI. Sila hubungi kami untuk sebarang pertanyaan. Teruskan bersama kami untuk Agenda yang akan datang");
+            
+            
+            //navigation.navigate('Success')
+            console.log("BERJAYA CIPTA AKAUN");
             console.log(response.data.message);
         }
     })
@@ -85,9 +97,15 @@ const Register = () => {
       />
       <TextInput
         style={styles.input}
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
+        placeholder="First Name"
+        value={firstName}
+        onChangeText={setFirstName}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Last Name"
+        value={lastName}
+        onChangeText={setLastName}
       />
       <TextInput
         style={styles.input}
@@ -96,12 +114,15 @@ const Register = () => {
         value={password}
         onChangeText={setPassword}
       />
-      <input type="file" onChange={handleChooseProfilePicture} />
+      <input 
+      style={styles.input}
+      type="file" onChange={handleChooseProfilePicture} 
+      />
       <TextInput
         style={styles.input}
-        placeholder="IC/Passport"
-        value={ic}
-        onChangeText={setIc}
+        placeholder="Date of Birth (MM/DD/YYYY)"
+        value={dob}
+        onChangeText={setDob}
       />
       <View style={styles.radioButtonsContainer}>
         <Text>Gender:</Text>
@@ -118,18 +139,14 @@ const Register = () => {
         value={phoneNumber}
         onChangeText={setPhoneNumber}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="University Email"
-        value={universityEmail}
-        onChangeText={setUniversityEmail}
-      />
+      {/*
       <TextInput
         style={styles.input}
         placeholder="Wallet Address"
         value={walletAddress}
         onChangeText={setWalletAddress}
       />
+      */}
       <Button title="Register" onPress={handleRegister} />
     {registerStatus ? <Text>{registerStatus}</Text> : null}
     </View>

@@ -18,16 +18,16 @@ const connection = mysql.createConnection({
   app.post('/register', (req,res) => {
     const user_id = req.body.email;
     const email = req.body.email;
-    const username = req.body.username;
+    const first_name = req.body.first_name;
+    const last_name = req.body.last_name;
     const profilePicture = req.body.profile_picture;
-    const ic = req.body.ic;
+    const dob = req.body.dob;
     const gender = req.body.gender;
-    const phoneNumber = req.body.phone_number;
-    const universityEmail = req.body.university_email;
+    const phone_number = req.body.phone_number;
     const walletAddress = req.body.wallet_address;
 
     console.log(` Sending info ${email}`);
-    connection.query("INSERT INTO `User` (`user_id`, `email`, `username`, `profile_picture`, `ic`, `gender`, `phone_number`, `university_email`, `wallet_address`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [user_id, email, username, profilePicture, ic, gender, phoneNumber, universityEmail, walletAddress],
+    connection.query("INSERT INTO `User` (`user_id`, `email`, `first_name`, `profile_picture`, `dob`, `gender`, `phone_number`, `last_name`, `wallet_address`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [user_id, email, first_name, profilePicture, dob, gender, phone_number, last_name, walletAddress],
         (err, result) => {
 
             console.log(result);
@@ -59,10 +59,10 @@ app.get('/Test', (req, res) => {
   });
 
 app.post('/login', (req,res) => {
-    const username = req.body.username;
+    const email = req.body.email;
     const password = req.body.password;
 
-    connection.query("SELECT * FROM User WHERE username = ? AND password = ?", [username, password],
+    connection.query("SELECT * FROM User WHERE email = ? AND password = ?", [email, password],
         (err, result) => {
             if(err){
                 req.setEncoding({err: err});
@@ -72,7 +72,7 @@ app.post('/login', (req,res) => {
                     res.send(result);
                 }
                 else{
-                    res.send({message: "WRONG USERNAME OR PASSWORD"})
+                    res.send({message: "WRONG email OR PASSWORD"})
                 }
             }
         }
