@@ -3,16 +3,17 @@ import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Platform }
 import Colors from '../Shared/Colors';
 import axios from 'axios';
 import { isValidEmail, isValidDateOfBirth } from './Validation';
-import { useNavigation } from '@react-navigation/native';
+import {  useNavigation, useRoute } from '@react-navigation/native';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import DefaultProfilePicture from '../Assets/Image/aktivAI.png';
 
 
-const Register = () => {
+const MaklumatProfil = () => {
   const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [profilePicture, setProfilePicture] = useState('');
   const [dob, setDob] = useState(null);
   const [gender, setGender] = useState('');
@@ -20,9 +21,19 @@ const Register = () => {
   const [lastName, setLastName] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
   const [registerStatus, setRegisterStatus] = useState('');
-  
   const [selectedDate, setSelectedDate] = useState(null);
   const [image, setImage] = useState(null);
+  const navigation = useNavigation(); 
+  
+
+  const route = useRoute();
+  const { email: routeEmail, password: routePassword } = route.params;
+
+  // Populate the fields with the received data
+  useEffect(() => {
+    setEmail(routeEmail);
+    setPassword(routePassword);
+  }, [routeEmail, routePassword]);
 
 // Function to format the date to "MM/DD/YYYY" format
 const formatDate = (date) => {
@@ -32,12 +43,15 @@ const formatDate = (date) => {
   return `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}/${year}`;
 };
 
+const handleConfirmPasswordChange = (text) => {
+  setConfirmPassword(text);
+};
   
-  
+
  
   const handleRegister = () => {
 
-    if (!email || !firstName || !lastName || !dob || !password || !gender || !phoneNumber) {
+    if (!email || !firstName || !lastName || !dob  || !password || !gender || !phoneNumber) {
       setRegisterStatus('Please fill in all fields');
 
       return;
@@ -46,31 +60,21 @@ const formatDate = (date) => {
       setRegisterStatus('Please enter a valid email address');
       return;
     }
-    /*
-    if (!isValidDateOfBirth(dob)) {
-      setRegisterStatus('Please enter a valid date of birth in MM/DD/YYYY format');
-      return;
-    }
-*/
-    // // Add form validation for email
-    //if (!email.includes('@')) {
-    //   setRegisterStatus('Please enter a valid email address');
-    //   return;
-    // }
-
+    
     // Add form validation for password
     if (password.length < 7) {
       setRegisterStatus('Password must be at least 8 characters long');
       return;
     }
 
+    
     // Add form validation for phone number
     if (phoneNumber.length <= 9) {
       setRegisterStatus('Phone number must be more 9 digits long With with out +6');
       return;
     }
 
-    axios.post("https://aktivai.web.app/register", {
+    axios.put("https://aktivai.web.app/maklumatprofil", {
         email: email,
         first_name: firstName,
         password: password,
@@ -87,9 +91,23 @@ const formatDate = (date) => {
         }else{
             setRegisterStatus("BERJAYA CIPTA AKAUN");
             setRegisterStatus("Terima kasih kerana menyertai AKTIVAI. Sila hubungi kami untuk sebarang pertanyaan. Teruskan bersama kami untuk Agenda yang akan datang");
+            //const navigation2 = useNavigation();
+           // navigation2.navigate('Success')
+           // if ("BERJAYA CIPTA AKAUN") {
+            // Navigate to "Profile" screen
             
-            const navigation2 = useNavigation();
-            navigation2.navigate('Success')
+            navigation.navigate('Success', {
+              email,
+              firstName,
+              lastName,
+              dob: dob ? formatDate(dob) : null,
+              gender,
+              phoneNumber,
+              profilePicture,
+              walletAddress,
+            });
+            
+            //}
             console.log("BERJAYA CIPTA AKAUN");
             console.log(response.data.message);
         }
@@ -115,7 +133,7 @@ const formatDate = (date) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Daftar AKTIVAI</Text>
+      <Text style={styles.title}>Maklumat Diri</Text>
       <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       {imagePreview ? (
       <View style={styles.profilePictureFrame}>
@@ -142,6 +160,13 @@ const formatDate = (date) => {
       />
       <TextInput
         style={styles.input}
+        placeholder="Password"
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
+      />
+      <TextInput
+        style={styles.input}
         placeholder="First Name"
         value={firstName}
         onChangeText={setFirstName}
@@ -152,14 +177,9 @@ const formatDate = (date) => {
         value={lastName}
         onChangeText={setLastName}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
-
+      
+      
+      
      <DatePicker
         selected={dob}
         onChange={(date) => setDob(date)}
@@ -186,15 +206,8 @@ const formatDate = (date) => {
         value={phoneNumber}
         onChangeText={setPhoneNumber}
       />
-      {/*
-      <TextInput
-        style={styles.input}
-        placeholder="Wallet Address"
-        value={walletAddress}
-        onChangeText={setWalletAddress}
-      />
-      */}
-      <Button title="Register" onPress={handleRegister} />
+      
+      <Button title="Kemaskini" onPress={handleRegister} />
     {registerStatus ? <Text>{registerStatus}</Text> : null}
     </View>
   );
@@ -282,4 +295,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Register;
+export default MaklumatProfil;

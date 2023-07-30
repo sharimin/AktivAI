@@ -6,16 +6,20 @@ import { useEffect, useState } from 'react';
 import Home from './App/Pages/Home';
 import Services from './App/Shared/Services';
 import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import HomeNavigation from './App/Navigations/HomeNavigations';
-import Register from './App/Pages/Register';
+import MaklumatProfil from './App/Pages/MaklumatProfil';
+import FirstRegister from './App/Pages/FirstRegister';
+import Profile from './App/Pages/Profile';
 import LoginOp from './App/Pages/LoginOp';
 import Success from './App/Pages/Success';
 import SuccessNavigation from './App/Navigations/SuccessNavigation';
 import RegisterNavigation from './App/Navigations/RegisterNavigation';
 
+
 export default 
 function App() {
-  
+  const Stack = createStackNavigator();
   const [userData, setUserData] = useState();
 
   useEffect(() => {
@@ -42,7 +46,23 @@ function App() {
             <HomeNavigation />
           </NavigationContainer>
         ) : (
-          <Register />
+          <NavigationContainer>
+            <Stack.Navigator>
+            <Stack.Screen name="FirstRegister" component={FirstRegister} options={{ headerShown: false }} />
+            <Stack.Screen name="MaklumatProfil" component={MaklumatProfil} />
+            <Stack.Screen name="Success" component={Success} />
+            </Stack.Navigator>
+          </NavigationContainer>
+          
+          /*
+          <NavigationContainer>
+              <Stack.Navigator>
+                <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
+                
+              </Stack.Navigator>
+          </NavigationContainer>
+          */
+         //<Register />
         )}
       </AuthContext.Provider>
       {/* <Register />

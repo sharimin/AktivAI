@@ -9,6 +9,7 @@ app.use(cors());
 app.use(express.json());
 
 const connection = mysql.createConnection({
+    
     host: 'srv1042.hstgr.io', // or '156.67.222.103'
     user: 'u438552292_aktivai_min',
     password: 'Resc00p@12345',
@@ -16,6 +17,29 @@ const connection = mysql.createConnection({
   });
 
   app.post('/register', (req,res) => {
+    const user_id = req.body.email;
+    const email = req.body.email;
+    
+
+    console.log(` Sending info ${email}`);
+    connection.query("INSERT INTO `User` (`user_id`, `email`, `password`) VALUES (?, ?, ?)", [user_id, email, password],
+        (err, result) => {
+
+            console.log(result);
+            res.send({message: result})
+            if(result){
+         
+                console.log(`Testing`); 
+                console.log("sucessfull");
+            }
+            else {
+                res.send({message: "ENTER CORRECT DETAILS!"})
+                console.log(`ENTER CORRECT DETAILS!`);
+            }
+        }
+    )
+})
+app.put('/maklumatprofil', (req,res) => {
     const user_id = req.body.email;
     const email = req.body.email;
     const first_name = req.body.first_name;
@@ -44,7 +68,6 @@ const connection = mysql.createConnection({
         }
     )
 })
-
 app.get('/Test', (req, res) => {
     console.log(`Testing`);
     connection.connect((err) => {

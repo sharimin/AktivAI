@@ -8,7 +8,8 @@ import { TouchableOpacity } from 'react-native-web';
 import { AuthContext } from '../Context/AuthContext';
 import Services from '../Shared/Services';
 
-export default function Login() {
+export default 
+function Login() {
 
   WebBrowser.maybeCompleteAuthSession();
   const [accessToken, setAccessToken] = useState();

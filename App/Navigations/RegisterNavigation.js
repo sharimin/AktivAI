@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { createStackNavigator } from '@react-navigation/stack';
-import Register from '../Pages/Register';
+import Register from '../Pages/MaklumatProfil';
 
 
 const Stack = createStackNavigator();

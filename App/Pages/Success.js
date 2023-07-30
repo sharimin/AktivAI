@@ -5,9 +5,9 @@ import Colors from '../Shared/Colors';
 const Success = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Account Created Successfully</Text>
+      <Text style={styles.title}>Tahniah!</Text>
       <Text style={styles.message}>
-        Thank you for choosing aktiv.io for your event management needs. We hope to see you around with us in the future at all of our upcoming events.
+        Anda telah berjaya mendaftar akaun AKTIVAI.
       </Text>
     </View>
   );
