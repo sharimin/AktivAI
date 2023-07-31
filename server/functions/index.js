@@ -19,6 +19,7 @@ const connection = mysql.createConnection({
   app.post('/register', (req,res) => {
     const user_id = req.body.email;
     const email = req.body.email;
+    const password = req.body.password;
     
 
     console.log(` Sending info ${email}`);
@@ -39,7 +40,7 @@ const connection = mysql.createConnection({
         }
     )
 })
-app.put('/maklumatprofil', (req,res) => {
+app.put('/register', (req,res) => {
     const user_id = req.body.email;
     const email = req.body.email;
     const first_name = req.body.first_name;
