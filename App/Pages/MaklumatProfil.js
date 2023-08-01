@@ -30,10 +30,10 @@ const MaklumatProfil = () => {
   const { email: routeEmail, password: routePassword } = route.params;
 
   // Populate the fields with the received data
-  useEffect(() => {
-    setEmail(routeEmail);
-    setPassword(routePassword);
-  }, [routeEmail, routePassword]);
+useEffect(() => {
+  setEmail(routeEmail);
+  setPassword(routePassword);
+}, [routeEmail, routePassword]);
 
 // Function to format the date to "MM/DD/YYYY" format
 const formatDate = (date) => {
@@ -74,7 +74,7 @@ const handleConfirmPasswordChange = (text) => {
       return;
     }
 
-    axios.put("https://aktivai.web.app/maklumatprofil", {
+    axios.put("https://aktivai.web.app/register", {
         email: email,
         first_name: firstName,
         password: password,

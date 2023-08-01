@@ -4,8 +4,8 @@ import Colors from '../Shared/Colors';
 import axios from 'axios';
 import { isValidEmail, isValidDateOfBirth } from './Validation';
 import { useNavigation } from '@react-navigation/native';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+//import DatePicker from 'react-datepicker';
+//import 'react-datepicker/dist/react-datepicker.css';
 import DefaultProfilePicture from '../Assets/Image/aktivAI.png';
 
 
@@ -49,24 +49,31 @@ const handleConfirmPasswordChange = (text) => {
     axios.post("https://aktivai.web.app/register", {
         email: email,
         password: password
-
-    }).then((response) => {
-        if(response.data.message){
+  })
+        .then((response) => {
+            if (response.data.message) {
             setRegisterStatus(response.data.message);
             console.log(response.data.message);
-        }else{
+            } else {
             setRegisterStatus("BERJAYA CIPTA AKAUN");
             setRegisterStatus("Terima kasih kerana menyertai AKTIVAI. Sila hubungi kami untuk sebarang pertanyaan. Teruskan bersama kami untuk Agenda yang akan datang");
+            
             navigation.navigate('MaklumatProfil', {
-              email,
-              password
+                email,
+                password
             });
             
-            //}
             console.log("BERJAYA CIPTA AKAUN");
             console.log(response.data.message);
-        }
-    })
+            }
+        })
+        .catch((error) => {
+            // Handle errors here
+            console.error("Error occurred:", error);
+            setRegisterStatus('An error occurred while registering. Please try again later.');
+        });
+    
+    
     
   };
 
