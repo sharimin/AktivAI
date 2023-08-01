@@ -16,30 +16,31 @@ const connection = mysql.createConnection({
     database: 'u438552292_aktivai',
   });
 
-  app.post('/register', (req,res) => {
+  app.post('/register', (req, res) => {
     const user_id = req.body.email;
     const email = req.body.email;
     const password = req.body.password;
-    
-
+  
     console.log(` Sending info ${email}`);
-    connection.query("INSERT INTO `User` (`user_id`, `email`, `password`) VALUES (?, ?, ?)", [user_id, email, password],
-        (err, result) => {
-
-            console.log(result);
-            res.send({message: result})
-            if(result){
-         
-                console.log(`Testing`); 
-                console.log("sucessfull");
-            }
-            else {
-                res.send({message: "ENTER CORRECT DETAILS!"})
-                console.log(`ENTER CORRECT DETAILS!`);
-            }
+    connection.query(
+      "INSERT INTO `User` (`user_id`, `email`, `password`) VALUES (?, ?, ?)",
+      [user_id, email, password],
+      (err, result) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send({ message: "An error occurred while registering. Please try again later." });
+        } else {
+          if (result.affectedRows > 0) {
+            console.log("Successful registration");
+            res.send({ message: "Successfully registered" });
+          } else {
+            console.log("Failed to insert user");
+            res.status(500).send({ message: "Failed to register user. Please check your details." });
+          }
         }
-    )
-})
+      }
+    );
+  });
 app.put('/register', (req,res) => {
     const user_id = req.body.email;
     const email = req.body.email;

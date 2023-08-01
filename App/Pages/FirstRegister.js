@@ -22,7 +22,7 @@ const handleConfirmPasswordChange = (text) => {
 };
   
  
-  const handleRegister = () => {
+  const handleFirstRegister = () => {
 
     if (!email || !confirmPassword || !password) {
       setRegisterStatus('Please fill in all fields');
@@ -55,14 +55,14 @@ const handleConfirmPasswordChange = (text) => {
             setRegisterStatus(response.data.message);
             console.log(response.data.message);
             } else {
-            setRegisterStatus("BERJAYA CIPTA AKAUN");
-            setRegisterStatus("Terima kasih kerana menyertai AKTIVAI. Sila hubungi kami untuk sebarang pertanyaan. Teruskan bersama kami untuk Agenda yang akan datang");
-            
+            /* setRegisterStatus("BERJAYA CIPTA AKAUN");
+            setRegisterStatus("Terima kasih kerana menyertai AKTIVAI. Sila hubungi kami untuk sebarang pertanyaan. Teruskan bersama kami untuk Agenda yang akan datang"); */
+            /*
             navigation.navigate('MaklumatProfil', {
                 email,
                 password
             });
-            
+            */
             console.log("BERJAYA CIPTA AKAUN");
             console.log(response.data.message);
             }
@@ -109,7 +109,7 @@ const handleConfirmPasswordChange = (text) => {
         onChangeText={handleConfirmPasswordChange}
       />
       
-      <Button title="Register" onPress={handleRegister} />
+      <Button title="Register" onPress={handleFirstRegister} />
     {registerStatus ? <Text>{registerStatus}</Text> : null}
     </View>
   );

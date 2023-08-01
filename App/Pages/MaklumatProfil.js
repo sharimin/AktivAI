@@ -91,12 +91,10 @@ const handleConfirmPasswordChange = (text) => {
         }else{
             setRegisterStatus("BERJAYA CIPTA AKAUN");
             setRegisterStatus("Terima kasih kerana menyertai AKTIVAI. Sila hubungi kami untuk sebarang pertanyaan. Teruskan bersama kami untuk Agenda yang akan datang");
-            //const navigation2 = useNavigation();
-           // navigation2.navigate('Success')
-           // if ("BERJAYA CIPTA AKAUN") {
-            // Navigate to "Profile" screen
+          
             
-            navigation.navigate('Success', {
+           // navigation.navigate('Success', {
+              /*
               email,
               firstName,
               lastName,
@@ -105,7 +103,8 @@ const handleConfirmPasswordChange = (text) => {
               phoneNumber,
               profilePicture,
               walletAddress,
-            });
+              */
+           // });
             
             //}
             console.log("BERJAYA CIPTA AKAUN");
@@ -208,7 +207,11 @@ const handleConfirmPasswordChange = (text) => {
       />
       
       <Button title="Kemaskini" onPress={handleRegister} />
-    {registerStatus ? <Text>{registerStatus}</Text> : null}
+      {registerStatus ? <Text>{registerStatus}</Text> : null}
+
+      {/* <Button title="Kemaskini" onPress={handleRegister} />
+        <Text>{registerStatus && registerStatus}</Text> */}
+        
     </View>
   );
 };
