@@ -2,6 +2,9 @@ const functions = require('firebase-functions');
 const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql');
+const nodemailer = require('nodemailer');
+
+
 
 const app = express();
 app.use(cors());
@@ -12,6 +15,14 @@ const pool = mysql.createPool({
   user: 'u438552292_aktivai_min',
   password: 'Resc00p@12345',
   database: 'u438552292_aktivai',
+});
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'your_email@gmail.com',
+    pass: 'your_password'
+  }
 });
 
 app.post('/register', (req, res) => {
@@ -85,21 +96,58 @@ app.post('/UpdateProfile', (req, res) => {
   });
 });
 
-app.get('/Test', (req, res) => {
-  pool.getConnection((err, connection) => {
-    if (err) {
-      res.json({ message: 'Error connecting to the database' });
-    } else {
-      res.json({ message: 'Connected to the database' });
+app.post('/sendVerificationCode', (req, res) => {
+  const { email } = req.body;
 
-      // Release the connection back to the pool
-      connection.release();
+  // Generate a random verification code
+  const verificationCode = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+
+  // Send the verification code to the user's email address
+  transporter.sendMail({
+    from: 'your_email@gmail.com',
+    to: email,
+    subject: 'Your Verification Code',
+    text: `Your verification code is: ${verificationCode}`
+  }, (err, info) => {
+    if (err) {
+      // Handle error sending the email
+      console.log(err);
+      res.send({ success: false, message: "An error occurred while sending the verification email. Please try again later." });
+    } else {
+      // Store the verification code in the database
+      pool.getConnection((err, connection) => {
+        if (err) {
+          // Handle error getting a connection from the pool
+          console.log(err);
+          res.send({ success: false, message: "An error occurred while sending the verification email. Please try again later." });
+        } else {
+          // Use the connection to perform the query
+          connection.query(
+            "UPDATE `User` SET `verification_code` = ? WHERE `email` = ?",
+            [verificationCode, email],
+            (err, result) => {
+              // Release the connection back to the pool
+              connection.release();
+
+              if (err) {
+                // Handle errors
+                console.log(err); // Log the error object to see more details
+                res.send({ success: false, message: "An error occurred while sending the verification email. Please try again later." });
+              } else {
+                res.send({ success: true, message: "Verification code sent successfully! Please check your email." });
+              }
+            }
+          );
+        }
+      });
     }
   });
 });
 
-app.post('/login', (req,res) => {
-  const { email, password } = req.body;
+
+
+app.post('/verify', (req, res) => {
+  const { email, verificationCode } = req.body;
 
   pool.getConnection((err, connection) => {
     if (err) {
@@ -109,8 +157,8 @@ app.post('/login', (req,res) => {
     } else {
       // Use the connection to perform the query
       connection.query(
-        "SELECT * FROM User WHERE email = ? AND password = ?",
-        [email,password],
+        "SELECT * FROM User WHERE email = ? AND verification_code = ?",
+        [email,verificationCode],
         (err,result) => {
           // Release the connection back to the pool
           connection.release();
@@ -119,9 +167,9 @@ app.post('/login', (req,res) => {
             req.setEncoding({ err });
           } else{
             if(result.length > 0){
-              res.send(result);
+              res.send({ success: true, message: "Email verified successfully!" });
             } else{
-              res.send({ message: "WRONG email OR PASSWORD" });
+              res.send({ success: false, message: "Invalid verification code. Please try again." });
             }
           }
         }
@@ -129,5 +177,6 @@ app.post('/login', (req,res) => {
     }
   });
 });
+
 
 exports.app = functions.https.onRequest(app);

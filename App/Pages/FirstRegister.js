@@ -32,16 +32,28 @@ const handleFirstRegister = () => {
     return;
   }
 
-  // Add form validation for password
-  if (password.length < 7) {
-    setRegisterStatus('Password must be at least 8 characters long');
-    return;
-  }
+ 
+ // Add form validation for password
+if (password.length < 8) {
+  setRegisterStatus('Password must be at least 8 characters long');
+  return;
+}
 
-  if (password !== confirmPassword) {
-    setRegisterStatus('Passwords do not match');
-    return;
-  }
+if (!/[A-Z]/.test(password)) {
+  setRegisterStatus('Password must contain at least one capital letter');
+  return;
+}
+
+if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+  setRegisterStatus('Password must contain at least one symbol');
+  return;
+}
+
+if (password !== confirmPassword) {
+  setRegisterStatus('Passwords do not match');
+  return;
+}
+
 
   axios
   .post('https://aktivai.web.app/register', {
