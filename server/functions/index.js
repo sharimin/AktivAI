@@ -2,106 +2,132 @@ const functions = require('firebase-functions');
 const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql');
-const app = express();
 
-// Enable CORS middleware
+const app = express();
 app.use(cors());
 app.use(express.json());
 
-const connection = mysql.createConnection({
-    
-    host: 'srv1042.hstgr.io', // or '156.67.222.103'
-    user: 'u438552292_aktivai_min',
-    password: 'Resc00p@12345',
-    database: 'u438552292_aktivai',
-  });
+const pool = mysql.createPool({
+  host: 'srv1042.hstgr.io',
+  user: 'u438552292_aktivai_min',
+  password: 'Resc00p@12345',
+  database: 'u438552292_aktivai',
+});
 
-  app.post('/register', (req, res) => {
-    const user_id = req.body.email;
-    const email = req.body.email;
-    const password = req.body.password;
-  
-    console.log(` Sending info ${email}`);
-    connection.query(
-      "INSERT INTO `User` (`user_id`, `email`, `password`) VALUES (?, ?, ?)",
-      [user_id, email, password],
-      (err, result) => {
-        if (err) {
-          console.error(err);
-          res.status(500).send({ message: "An error occurred while registering. Please try again later." });
-        } else {
-          if (result.affectedRows > 0) {
-            console.log("Successful registration");
-            res.send({ message: "Successfully registered" });
+app.post('/register', (req, res) => {
+  const { email, password } = req.body;
+  const user_id = email;
+
+  pool.getConnection((err, connection) => {
+    if (err) {
+      // Handle error getting a connection from the pool
+      console.log(err);
+      res.send({ success: false, message: "An error occurred while registering. Please try again later." });
+    } else {
+      // Use the connection to perform the query
+      connection.query(
+        "INSERT INTO `User` (`user_id`, `email`, `password`) VALUES (?, ?, ?)",
+        [user_id, email, password],
+        (err, result) => {
+          // Release the connection back to the pool
+          connection.release();
+
+          if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+              // Handle duplicate entry error
+              res.send({ success: false, message: "An account with this email address already exists. Please use a different email address." });
+            } else {
+              // Handle other errors
+              console.log(err); // Log the error object to see more details
+              res.send({ success: false, message: "An error occurred while registering. Please try again later." });
+            }
           } else {
-            console.log("Failed to insert user");
-            res.status(500).send({ message: "Failed to register user. Please check your details." });
+            res.send({ success: true, message: "Account created successfully!" });
           }
         }
-      }
-    );
+      );
+    }
   });
-app.put('/register', (req,res) => {
-    const user_id = req.body.email;
-    const email = req.body.email;
-    const first_name = req.body.first_name;
-    const last_name = req.body.last_name;
-    const profilePicture = req.body.profile_picture;
-    const dob = req.body.dob;
-    const gender = req.body.gender;
-    const phone_number = req.body.phone_number;
-    const walletAddress = req.body.wallet_address;
+});
 
-    console.log(` Sending info ${email}`);
-    connection.query("INSERT INTO `User` (`user_id`, `email`, `first_name`, `profile_picture`, `dob`, `gender`, `phone_number`, `last_name`, `wallet_address`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [user_id, email, first_name, profilePicture, dob, gender, phone_number, last_name, walletAddress],
+app.post('/UpdateProfile', (req, res) => {
+  const { email, user_id, first_name, last_name, profile_picture, dob, gender, phone_number } = req.body;
+
+  pool.getConnection((err, connection) => {
+    if (err) {
+      // Handle error getting a connection from the pool
+      console.log(err);
+      res.send({ success: false, message: "An error occurred while updating your profile. Please try again later." });
+    } else {
+      // Use the connection to perform the query
+      connection.query(
+        "UPDATE `User` SET `user_id` = ?, `first_name` = ?, `last_name` = ?, `profile_picture` = ?, `dob` = ?, `gender` = ?, `phone_number` = ? WHERE `email` = ?",
+        [user_id, first_name, last_name, profile_picture, dob, gender, phone_number, email],
         (err, result) => {
+          // Release the connection back to the pool
+          connection.release();
 
-            console.log(result);
-            res.send({message: result})
-            if(result){
-         
-                console.log(`Testing`); 
-                console.log("sucessfull");
+          if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+              // Handle duplicate entry error
+              res.send({ success: false, message: "The username is already taken. Please use a different username." });
+            } else {
+              // Handle other errors
+              console.log(err); // Log the error object to see more details
+              res.send({ success: false, message: "An error occurred while updating your profile. Please try again later." });
             }
-            else {
-                res.send({message: "ENTER CORRECT DETAILS!"})
-                console.log(`ENTER CORRECT DETAILS!`);
-            }
+          } else {
+            res.send({ success: true, message: "Profile updated successfully!" });
+          }
         }
-    )
-})
-app.get('/Test', (req, res) => {
-    console.log(`Testing`);
-    connection.connect((err) => {
-      if (err) {
-        console.log('Error connecting to the database');
-        return res.json({ message: 'Error connecting to the database '+ res +' '+  err});
-      } else {
-        console.log('Connected to the database');
-        return res.json({ message: 'Connected to the database' });
-      }
-    });
+      );
+    }
   });
+});
+
+app.get('/Test', (req, res) => {
+  pool.getConnection((err, connection) => {
+    if (err) {
+      res.json({ message: 'Error connecting to the database' });
+    } else {
+      res.json({ message: 'Connected to the database' });
+
+      // Release the connection back to the pool
+      connection.release();
+    }
+  });
+});
 
 app.post('/login', (req,res) => {
-    const email = req.body.email;
-    const password = req.body.password;
+  const { email, password } = req.body;
 
-    connection.query("SELECT * FROM User WHERE email = ? AND password = ?", [email, password],
-        (err, result) => {
-            if(err){
-                req.setEncoding({err: err});
+  pool.getConnection((err, connection) => {
+    if (err) {
+      // Handle error getting a connection from the pool
+      console.log(err);
+      res.send({ err });
+    } else {
+      // Use the connection to perform the query
+      connection.query(
+        "SELECT * FROM User WHERE email = ? AND password = ?",
+        [email,password],
+        (err,result) => {
+          // Release the connection back to the pool
+          connection.release();
+
+          if(err){
+            req.setEncoding({ err });
+          } else{
+            if(result.length > 0){
+              res.send(result);
+            } else{
+              res.send({ message: "WRONG email OR PASSWORD" });
             }
-            else {
-                if(result.length > 0){
-                    res.send(result);
-                }
-                else{
-                    res.send({message: "WRONG email OR PASSWORD"})
-                }
-            }
+          }
         }
-    )
-})
+      );
+    }
+  });
+});
 
 exports.app = functions.https.onRequest(app);

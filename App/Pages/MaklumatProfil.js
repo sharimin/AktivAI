@@ -12,109 +12,62 @@ import DefaultProfilePicture from '../Assets/Image/aktivAI.png';
 const MaklumatProfil = () => {
   const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [profilePicture, setProfilePicture] = useState('');
+  const [userId, setUserid] = useState('');
   const [dob, setDob] = useState(null);
   const [gender, setGender] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [lastName, setLastName] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
   const [registerStatus, setRegisterStatus] = useState('');
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [image, setImage] = useState(null);
-  const navigation = useNavigation(); 
-  
-
+  const navigation = useNavigation();
   const route = useRoute();
-  const { email: routeEmail, password: routePassword } = route.params;
+  const { email: routeEmail } = route.params;
 
   // Populate the fields with the received data
-useEffect(() => {
-  setEmail(routeEmail);
-  setPassword(routePassword);
-}, [routeEmail, routePassword]);
+  useEffect(() => {
+    setEmail(routeEmail);
+  }, [routeEmail]);
 
-// Function to format the date to "MM/DD/YYYY" format
-const formatDate = (date) => {
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  const year = date.getFullYear();
-  return `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}/${year}`;
-};
+  // Function to format the date to "MM/DD/YYYY" format
+  const formatDate = (date) => {
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const year = date.getFullYear();
+    return `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}/${year}`;
+  };
 
-const handleConfirmPasswordChange = (text) => {
-  setConfirmPassword(text);
-};
-  
-
- 
   const handleRegister = () => {
-
-    if (!email || !firstName || !lastName || !dob  || !password || !gender || !phoneNumber) {
+    if (!email || !firstName || !lastName || !dob || !gender || !phoneNumber) {
       setRegisterStatus('Please fill in all fields');
-
-      return;
-    }
-    if (!isValidEmail(email)) {
-      setRegisterStatus('Please enter a valid email address');
-      return;
-    }
-    
-    // Add form validation for password
-    if (password.length < 7) {
-      setRegisterStatus('Password must be at least 8 characters long');
       return;
     }
 
-    
     // Add form validation for phone number
-    if (phoneNumber.length <= 9) {
-      setRegisterStatus('Phone number must be more 9 digits long With with out +6');
-      return;
-    }
+  if (phoneNumber.length <= 9) {
+    setRegisterStatus('Phone number must be more than 9 digits long with or without +6');
+    return;
+  }
 
-    axios.put("https://aktivai.web.app/register", {
+    axios
+      .post('https://aktivai.web.app/UpdateProfile', {
         email: email,
+        user_id: userId,
         first_name: firstName,
-        password: password,
-        profile_picture: profilePicture,
         dob: dob ? formatDate(dob) : null,
         gender: gender,
         phone_number: phoneNumber,
         last_name: lastName,
-        wallet_address: walletAddress
-    }).then((response) => {
-        if(response.data.message){
-            setRegisterStatus(response.data.message);
-            console.log(response.data.message);
-        }else{
-            setRegisterStatus("BERJAYA CIPTA AKAUN");
-            setRegisterStatus("Terima kasih kerana menyertai AKTIVAI. Sila hubungi kami untuk sebarang pertanyaan. Teruskan bersama kami untuk Agenda yang akan datang");
-          
-            
-           // navigation.navigate('Success', {
-              /*
-              email,
-              firstName,
-              lastName,
-              dob: dob ? formatDate(dob) : null,
-              gender,
-              phoneNumber,
-              profilePicture,
-              walletAddress,
-              */
-           // });
-            
-            //}
-            console.log("BERJAYA CIPTA AKAUN");
-            console.log(response.data.message);
+      })
+      .then((response) => {
+        if (response.data.success) {
+          // Profile update was successful
+          navigation.navigate('Success', {});
+        } else {
+          // An error occurred
+          setRegisterStatus(response.data.message);
         }
-    })
-    
+      });
   };
-
-  
 
   const [imagePreview, setImagePreview] = useState(null);
 
@@ -157,12 +110,11 @@ const handleConfirmPasswordChange = (text) => {
         value={email}
         onChangeText={setEmail}
       />
-      <TextInput
+       <TextInput
         style={styles.input}
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
+        placeholder="Username"
+        value={userId}
+        onChangeText={setUserid}
       />
       <TextInput
         style={styles.input}
@@ -176,9 +128,6 @@ const handleConfirmPasswordChange = (text) => {
         value={lastName}
         onChangeText={setLastName}
       />
-      
-      
-      
      <DatePicker
         selected={dob}
         onChange={(date) => setDob(date)}

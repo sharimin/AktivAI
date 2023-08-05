@@ -22,60 +22,52 @@ const handleConfirmPasswordChange = (text) => {
 };
   
  
-  const handleFirstRegister = () => {
+const handleFirstRegister = () => {
+  if (!email || !confirmPassword || !password) {
+    setRegisterStatus('Please fill in all fields');
+    return;
+  }
+  if (!isValidEmail(email)) {
+    setRegisterStatus('Please enter a valid email address');
+    return;
+  }
 
-    if (!email || !confirmPassword || !password) {
-      setRegisterStatus('Please fill in all fields');
+  // Add form validation for password
+  if (password.length < 7) {
+    setRegisterStatus('Password must be at least 8 characters long');
+    return;
+  }
 
-      return;
-    }
-    if (!isValidEmail(email)) {
-      setRegisterStatus('Please enter a valid email address');
-      return;
-    }
-    
-    // Add form validation for password
-    if (password.length < 7) {
-      setRegisterStatus('Password must be at least 8 characters long');
-      return;
-    }
+  if (password !== confirmPassword) {
+    setRegisterStatus('Passwords do not match');
+    return;
+  }
 
-    if (password !== confirmPassword) {
-      setRegisterStatus('Passwords do not match');
-      return;
-    }
-
-
-    axios.post("https://aktivai.web.app/register", {
-        email: email,
-        password: password
+  axios
+  .post('https://aktivai.web.app/register', {
+    email: email,
+    password: password,
   })
-        .then((response) => {
-            if (response.data.message) {
-            setRegisterStatus(response.data.message);
-            console.log(response.data.message);
-            } else {
-            /* setRegisterStatus("BERJAYA CIPTA AKAUN");
-            setRegisterStatus("Terima kasih kerana menyertai AKTIVAI. Sila hubungi kami untuk sebarang pertanyaan. Teruskan bersama kami untuk Agenda yang akan datang"); */
-            /*
-            navigation.navigate('MaklumatProfil', {
-                email,
-                password
-            });
-            */
-            console.log("BERJAYA CIPTA AKAUN");
-            console.log(response.data.message);
-            }
-        })
-        .catch((error) => {
-            // Handle errors here
-            console.error("Error occurred:", error);
-            setRegisterStatus('An error occurred while registering. Please try again later.');
-        });
-    
-    
-    
-  };
+  .then((response) => {
+    if (response.data.success) {
+      // Registration was successful
+      navigation.navigate('MaklumatProfil', {
+        email,
+        password,
+      });
+    } else {
+      // An error occurred
+      setRegisterStatus('An error occurred while registering. Please try again later.' + response.data.message);
+    }
+  })
+  .catch((error) => {
+    // Handle errors here
+    console.error('Error occurred:', error);
+    setRegisterStatus('An error occurred while registering. Please try again later.');
+  });
+
+};
+
 
 
   return (
