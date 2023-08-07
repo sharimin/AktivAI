@@ -73,7 +73,6 @@ export const listOfProfessions = [
     'Criminologist',
     'Cybersecurity Analyst',
     'Data Analyst',
-    'Economist',
     'Electrical Engineer',
     'Environmental Scientist',
     'Event Planner',

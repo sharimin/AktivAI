@@ -47,7 +47,7 @@ const MaklumatProfil = () => {
     }
 
     // Add form validation for phone number
-  if (phoneNumber.length >= 9) {
+  if (phoneNumber.length <= 9) {
     setRegisterStatus('Nombor telefon mestilah lebih daripada 9 digit dengan atau tanpa +6');
     return;
   }

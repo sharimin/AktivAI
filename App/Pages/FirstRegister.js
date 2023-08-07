@@ -32,17 +32,52 @@ const handleFirstRegister = () => {
     return;
   }
 
-  // Add form validation for password
-  if (password.length < 7) {
-    setRegisterStatus('Password must be at least 8 characters long');
-    return;
-  }
+
 
   if (password !== confirmPassword) {
-    setRegisterStatus('Passwords do not match');
+    setRegisterStatus('Kata laluan tidak sama');
     return;
   }
+  const passwordValidationResult = isValidPassword(password);
+    if (!passwordValidationResult.isValid) {
+    let errorMessage = 'Sila masukkan kata laluan yang kuat dengan:';
+    const { requirements } = passwordValidationResult;
+    if (!requirements.length) errorMessage += ' sekurang-kurangnya 8 karakter,';
+    if (!requirements.uppercase) errorMessage += ' sekurang-kurangnya satu huruf besar,';
+    if (!requirements.lowercase) errorMessage += ' sekurang-kurangnya satu huruf kecil,';
+    if (!requirements.number) errorMessage += ' sekurang-kurangnya satu nombor,';
+    if (!requirements.specialCharacter) errorMessage += ' sekurang-kurangnya satu karakter khas (@$!%*?&),';
 
+ 
+ // Add form validation for password
+if (password.length < 8) {
+  setRegisterStatus('sekurang-kurangnya 8 karakter');
+  return;
+}
+
+if (!/[A-Z]/.test(password)) {
+  setRegisterStatus('sekurang-kurangnya satu huruf besar');
+  return;
+}
+
+if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+  setRegisterStatus('sekurang-kurangnya satu karakter khas (@$!%*?&)');
+  return;
+}
+
+if (password !== confirmPassword) {
+  setRegisterStatus('Kata laluan tidak sama');
+  return;
+}
+
+
+
+    // Remove the trailing comma
+    errorMessage = errorMessage.replace(/,\s*$/, '');
+
+    setRegisterStatus(errorMessage);
+    return;
+  }
   axios
   .post('https://aktivai.web.app/register', {
     email: email,
