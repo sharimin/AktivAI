@@ -1,3 +1,8 @@
+export const listOfGenders =[
+  'Lelaki',
+  'Wanita'
+]
+
 // Professions.js
 export const listOfProfessions = [
     'Accountant',

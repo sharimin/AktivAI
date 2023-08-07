@@ -3,7 +3,8 @@ import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Platform }
 import Colors from '../Shared/Colors';
 import axios from 'axios';
 import { isValidEmail, isValidDateOfBirth, isValidPassword } from './Validation';
-import { listOfProfessions } from './Professions';
+import { listOfStates } from './States';
+import { listOfProfessions, listOfGenders } from './Professions';
 import {  useNavigation, useRoute } from '@react-navigation/native';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -12,7 +13,9 @@ import DefaultProfilePicture from '../Assets/Image/aktivAI.png';
 
 const MaklumatProfil = () => {
   const [email, setEmail] = useState('');
+  const [bio, setBio] = useState('');
   const [firstName, setFirstName] = useState('');
+  const [profilePicture, setProfilePicture] = useState(null);
   const [userId, setUserid] = useState('');
   const [dob, setDob] = useState(null);
   const [gender, setGender] = useState('');
@@ -23,15 +26,33 @@ const MaklumatProfil = () => {
   const [walletAddress, setWalletAddress] = useState('');
   const [registerStatus, setRegisterStatus] = useState('');
   const [profession, setProfession] = useState('');
+  const listOfGenders = ['Lelaki', 'Wanita']; // Add more options if needed
+
   const navigation = useNavigation();
   const route = useRoute();
   const { email: routeEmail } = route.params;
-  const professions = ['Engineer', 'Medical', 'Teacher', 'Lawyer', 'Artist', 'Chef', 'Writer', 'Entrepreneur'];
+
   // Populate the fields with the received data
   useEffect(() => {
     setEmail(routeEmail);
   }, [routeEmail]);
-
+const datePickerStyles = {
+  width: '80%',
+  height: 40,
+  borderColor: Colors.primary,
+  borderWidth: 1,
+  borderRadius: 5,
+  paddingHorizontal: 10,
+  marginBottom: 12,
+};
+const dropdownStyles = {
+  width: '80%',
+  height: 40,
+  borderColor: Colors.primary,
+  borderWidth: 1,
+  borderRadius: 5,
+  paddingHorizontal: 10,
+};
   // Function to format the date to "MM/DD/YYYY" format
   const formatDate = (date) => {
     const month = date.getMonth() + 1;
@@ -39,9 +60,12 @@ const MaklumatProfil = () => {
     const year = date.getFullYear();
     return `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}/${year}`;
   };
-
+  const validateBio = (text) => {
+    const wordCount = text.trim().split(/\s+/).length;
+    return wordCount <= 120;
+  };
   const handleRegister = () => {
-    if (!email || !firstName || !lastName || !dob || !gender || !phoneNumber || !profession || !city || !states) {
+    if (!email || !firstName || !lastName || !dob || !gender || !phoneNumber  || !city || !states || !profession) {
       setRegisterStatus('Sila lengkapkan semua medan');
       return;
     }
@@ -65,20 +89,25 @@ const MaklumatProfil = () => {
     setRegisterStatus('Sila masukkan alamat emel yang sah.');
     return;
   }
-
+// Validation for bio field word count
+if (!validateBio(bio)) {
+  setRegisterStatus('Bio mesti kurang daripada 120 patah perkataan.');
+  return;
+}
   
     axios
       .post('https://aktivai.web.app/UpdateProfile', {
         email: email,
+        bio: bio,
         user_id: userId,
         first_name: firstName,
         dob: dob ? formatDate(dob) : null,
         gender: gender,
         phone_number: phoneNumber,
         last_name: lastName,
-        profession: profession,
         city: city,
         states: states,
+        profession: profession,
       })
       .then((response) => {
         if (response.data.success) {
@@ -104,6 +133,7 @@ const MaklumatProfil = () => {
       reader.readAsDataURL(file);
     }
   };
+  
 
   return (
     <View style={styles.container}>
@@ -126,92 +156,112 @@ const MaklumatProfil = () => {
         onChange={handleChooseProfilePicture} 
       />
       </View>
-      <TextInput
-     style={styles.input}
-     placeholder="Alamat Emel"
-     value={email}
-     onChangeText={setEmail}
-   />
-<TextInput
-     style={styles.input}
-     placeholder="Nama Pengguna"
-     value={userId}
-     onChangeText={setUserid}
-   />
-<TextInput
-     style={styles.input}
-     placeholder="Nama Pertama"
-     value={firstName}
-     onChangeText={setFirstName}
-   />
-<TextInput
-     style={styles.input}
-     placeholder="Nama Terakhir"
-     value={lastName}
-     onChangeText={setLastName}
-   />
-     <DatePicker
-        selected={dob}
-        onChange={(date) => setDob(date)}
-        dateFormat="MM/dd/yyyy"
-        placeholderText="Date of Birth (MM/DD/YYYY)"
-        showYearDropdown
-        scrollableYearDropdown
-        yearDropdownItemNumber={100}
-        className="datepicker-input"
-      />
 
-      <View style={styles.radioButtonsContainer}>
-        <Text>Jantina:</Text>
-        <TouchableOpacity onPress={() => setGender('Male')}>
-          <Text style={[styles.radioButton, gender === 'Male' && styles.radioButtonSelected]}>Lelaki</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setGender('Female')}>
-          <Text style={[styles.radioButton, gender === 'Female' && styles.radioButtonSelected]}>Wanita</Text>
-        </TouchableOpacity>
-      </View>
-      {/* Add the dropdown for profession */}
-      <View style={styles.dropdownContainer}>
-        <Text style={styles.dropdownLabel}>Kerjaya:</Text>
-        <select
-          style={styles.dropdown}
-          value={profession}
-          onChange={(e) => setProfession(e.target.value)}
-        >
-          <option value="">Sila Pilih Kerjaya</option>
-          {listOfProfessions.map((prof) => (
-            <option key={prof} value={prof}>
-              {prof}
-            </option>
-          ))}
-        </select>
-      </View>
       <TextInput
-        style={styles.input}
-        placeholder="No. Telefon"
-        value={phoneNumber}
-        onChangeText={setPhoneNumber}
+        style={styles.bigInput} // Use styles.bigInput for a bigger multiline input
+        placeholder={`Bio (Maksimum 120 patah perkataan)`}
+        value={bio}
+        onChangeText={setBio}
+        multiline={true} // Enable multiline for the bio input
       />
       <TextInput
-        style={styles.input}
-        placeholder="Bandar"
-        value={city}
-        onChangeText={setCity}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Negeri"
-        value={states}
-        onChangeText={setStates}
-      />
-      
-      <Button title="Kemaskini" onPress={handleRegister} />
-      {registerStatus ? <Text>{registerStatus}</Text> : null}
-
-      {/* <Button title="Kemaskini" onPress={handleRegister} />
-        <Text>{registerStatus && registerStatus}</Text> */}
-        
+      style={styles.input}
+      placeholder="Alamat Emel"
+      value={email}
+      onChangeText={setEmail}
+    />
+    <TextInput
+      style={styles.input}
+      placeholder="Nama Pengguna"
+      value={userId}
+      onChangeText={setUserid}
+    />
+    <TextInput
+      style={styles.input}
+      placeholder="Nama Pertama"
+      value={firstName}
+      onChangeText={setFirstName}
+    />
+    <TextInput
+      style={styles.input}
+      placeholder="Nama Terakhir"
+      value={lastName}
+      onChangeText={setLastName}
+    />
+    <View style={styles.dropdownContainer}>
+    <DatePicker
+      selected={dob}
+      onChange={(date) => setDob(date)}
+      dateFormat="MM/dd/yyyy"
+      placeholderText="Tarikh Lahir (MM/DD/YYYY)"
+      showYearDropdown
+      scrollableYearDropdown
+      yearDropdownItemNumber={100}
+      style={dropdownStyles} // Apply the updated style to the DatePicker component
+  />
     </View>
+    
+    
+    <View style={styles.dropdownContainer}>
+    <select
+    style={dropdownStyles} // Apply the updated style to the select element
+    value={gender}
+    onChange={(e) => setGender(e.target.value)}
+    className={styles.gender}
+  >
+    <option value="">Jantina</option>
+    {listOfGenders.map((gender) => (
+      <option key={gender} value={gender}>
+        {gender}
+      </option>
+    ))}
+  </select>
+</View>
+    <TextInput
+      style={styles.input}
+      placeholder="No. Telefon"
+      value={phoneNumber}
+      onChangeText={setPhoneNumber}
+    />
+    <View style={styles.dropdownContainer}>
+      <select
+        style={styles.dropdown}
+        value={states}
+        onChange={(e) => setStates(e.target.value)}
+        className={styles.states} // Apply the style to the select element
+      >
+        <option value="">Negeri</option>
+        {listOfStates.map((state) => (
+          <option key={state} value={state}>
+            {state}
+          </option>
+        ))}
+      </select>
+    </View>
+    <TextInput
+      style={styles.input}
+      placeholder="Bandar"
+      value={city}
+      onChangeText={setCity}
+    />
+    {/* Add the dropdown for profession */}
+  <View style={styles.dropdownContainer}>
+    <select
+      style={styles.dropdown}
+      value={profession}
+      onChange={(e) => setProfession(e.target.value)}
+    >
+      <option value="">Kerjaya</option>
+      {listOfProfessions.map((prof) => (
+        <option key={prof} value={prof}>
+          {prof}
+        </option>
+      ))}
+    </select>
+  </View>
+    <Button title="Kemaskini" onPress={handleRegister} />
+    {registerStatus ? <Text>{registerStatus}</Text> : null}
+  </View>
   );
 };
 
@@ -229,6 +279,15 @@ const styles = StyleSheet.create({
   input: {
     width: '80%',
     height: 40,
+    borderColor: Colors.primary,
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 12,
+  },
+  bigInput: {
+    width: '80%',
+    height: 80,
     borderColor: Colors.primary,
     borderWidth: 1,
     borderRadius: 5,
@@ -257,6 +316,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     color: 'white',
   },
+  
   'datepicker-input': {
     width: '80%',
     height: 40,
@@ -304,13 +364,14 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   dropdown: {
-    width: '80%',
+    width: '100%',
     height: 40,
     borderColor: Colors.primary,
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
   },
+  
   
 });
 

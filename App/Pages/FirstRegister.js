@@ -108,12 +108,8 @@ if (password !== confirmPassword) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Daftar AKTIVAI</Text>
-      <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-
-          <View style={styles.profilePictureFrame}>
-            <img src={DefaultProfilePicture} alt="Default Profile Picture" style={styles.profilePicture} />
-          </View>
-
+      <View style={styles.profilePicture}>
+        <img src={DefaultProfilePicture} alt="Default Profile Picture" style={styles.profilePicture} />
       </View>
       <TextInput
         style={styles.input}
@@ -209,19 +205,22 @@ const styles = StyleSheet.create({
   },
   
   profilePictureFrame: {
-    border: '5px solid #ffffff', 
-    boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)', 
-    borderRadius: '50%', 
-    overflow: 'hidden', 
+    border: '5px solid #ffffff',
+    boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
+    borderRadius: '50%',
+    overflow: 'hidden',
     marginBottom: 16,
-    width: 150, // Adjust the width of the frame
-    height: 150, // Adjust the height of the frame
+    width: 100, // Adjust the width of the frame
+    height: 100, // Adjust the height of the frame
   },
+
   profilePicture: {
     width: '100%',
     height: '100%',
+    width: 200, // Adjust the width of the frame
+    height: 200,
     objectFit: 'cover', // Ensure the picture fills the frame without stretching
-  }
+  },
 });
 
 export default FirstRegister;
