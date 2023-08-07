@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Platform } from 'react-native-web';
 import Colors from '../Shared/Colors';
 import axios from 'axios';
-import { isValidEmail, isValidDateOfBirth } from './Validation';
+import { isValidEmail, isValidDateOfBirth, isValidPassword } from './Validation';
+import { listOfProfessions } from './Professions';
 import {  useNavigation, useRoute } from '@react-navigation/native';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -16,13 +17,16 @@ const MaklumatProfil = () => {
   const [dob, setDob] = useState(null);
   const [gender, setGender] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [city, setCity] = useState('');
+  const [states, setStates] = useState('');
   const [lastName, setLastName] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
   const [registerStatus, setRegisterStatus] = useState('');
+  const [profession, setProfession] = useState('');
   const navigation = useNavigation();
   const route = useRoute();
   const { email: routeEmail } = route.params;
-
+  const professions = ['Engineer', 'Medical', 'Teacher', 'Lawyer', 'Artist', 'Chef', 'Writer', 'Entrepreneur'];
   // Populate the fields with the received data
   useEffect(() => {
     setEmail(routeEmail);
@@ -37,17 +41,32 @@ const MaklumatProfil = () => {
   };
 
   const handleRegister = () => {
-    if (!email || !firstName || !lastName || !dob || !gender || !phoneNumber) {
-      setRegisterStatus('Please fill in all fields');
+    if (!email || !firstName || !lastName || !dob || !gender || !phoneNumber || !profession || !city || !states) {
+      setRegisterStatus('Sila lengkapkan semua medan');
       return;
     }
 
     // Add form validation for phone number
-  if (phoneNumber.length <= 9) {
-    setRegisterStatus('Phone number must be more than 9 digits long with or without +6');
+  if (phoneNumber.length >= 9) {
+    setRegisterStatus('Nombor telefon mestilah lebih daripada 9 digit dengan atau tanpa +6');
+    return;
+  }
+  // Validation for city and states (begin with a capital letter)
+  if (!/^[A-Z][a-zA-Z\s]*$/.test(city)) {
+    setRegisterStatus('Bandar mesti bermula dengan huruf besar');
     return;
   }
 
+  if (!/^[A-Z][a-zA-Z\s]*$/.test(states)) {
+    setRegisterStatus('Negeri mesti bermula dengan huruf besar');
+    return;
+  }
+  if (!isValidEmail(email)) {
+    setRegisterStatus('Sila masukkan alamat emel yang sah.');
+    return;
+  }
+
+  
     axios
       .post('https://aktivai.web.app/UpdateProfile', {
         email: email,
@@ -57,6 +76,9 @@ const MaklumatProfil = () => {
         gender: gender,
         phone_number: phoneNumber,
         last_name: lastName,
+        profession: profession,
+        city: city,
+        states: states,
       })
       .then((response) => {
         if (response.data.success) {
@@ -105,29 +127,29 @@ const MaklumatProfil = () => {
       />
       </View>
       <TextInput
-        style={styles.input}
-        placeholder="Email Address"
-        value={email}
-        onChangeText={setEmail}
-      />
-       <TextInput
-        style={styles.input}
-        placeholder="Username"
-        value={userId}
-        onChangeText={setUserid}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="First Name"
-        value={firstName}
-        onChangeText={setFirstName}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Last Name"
-        value={lastName}
-        onChangeText={setLastName}
-      />
+     style={styles.input}
+     placeholder="Alamat Emel"
+     value={email}
+     onChangeText={setEmail}
+   />
+<TextInput
+     style={styles.input}
+     placeholder="Nama Pengguna"
+     value={userId}
+     onChangeText={setUserid}
+   />
+<TextInput
+     style={styles.input}
+     placeholder="Nama Pertama"
+     value={firstName}
+     onChangeText={setFirstName}
+   />
+<TextInput
+     style={styles.input}
+     placeholder="Nama Terakhir"
+     value={lastName}
+     onChangeText={setLastName}
+   />
      <DatePicker
         selected={dob}
         onChange={(date) => setDob(date)}
@@ -140,19 +162,47 @@ const MaklumatProfil = () => {
       />
 
       <View style={styles.radioButtonsContainer}>
-        <Text>Gender:</Text>
+        <Text>Jantina:</Text>
         <TouchableOpacity onPress={() => setGender('Male')}>
-          <Text style={[styles.radioButton, gender === 'Male' && styles.radioButtonSelected]}>Male</Text>
+          <Text style={[styles.radioButton, gender === 'Male' && styles.radioButtonSelected]}>Lelaki</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setGender('Female')}>
-          <Text style={[styles.radioButton, gender === 'Female' && styles.radioButtonSelected]}>Female</Text>
+          <Text style={[styles.radioButton, gender === 'Female' && styles.radioButtonSelected]}>Wanita</Text>
         </TouchableOpacity>
+      </View>
+      {/* Add the dropdown for profession */}
+      <View style={styles.dropdownContainer}>
+        <Text style={styles.dropdownLabel}>Kerjaya:</Text>
+        <select
+          style={styles.dropdown}
+          value={profession}
+          onChange={(e) => setProfession(e.target.value)}
+        >
+          <option value="">Sila Pilih Kerjaya</option>
+          {listOfProfessions.map((prof) => (
+            <option key={prof} value={prof}>
+              {prof}
+            </option>
+          ))}
+        </select>
       </View>
       <TextInput
         style={styles.input}
-        placeholder="Phone Number"
+        placeholder="No. Telefon"
         value={phoneNumber}
         onChangeText={setPhoneNumber}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Bandar"
+        value={city}
+        onChangeText={setCity}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Negeri"
+        value={states}
+        onChangeText={setStates}
       />
       
       <Button title="Kemaskini" onPress={handleRegister} />
@@ -244,7 +294,24 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     objectFit: 'cover', // Ensure the picture fills the frame without stretching
-  }
+  },
+  dropdownContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  dropdownLabel: {
+    marginRight: 8,
+  },
+  dropdown: {
+    width: '80%',
+    height: 40,
+    borderColor: Colors.primary,
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+  },
+  
 });
 
 export default MaklumatProfil;

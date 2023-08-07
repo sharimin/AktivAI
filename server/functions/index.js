@@ -51,7 +51,7 @@ app.post('/register', (req, res) => {
 });
 
 app.post('/UpdateProfile', (req, res) => {
-  const { email, user_id, first_name, last_name, profile_picture, dob, gender, phone_number } = req.body;
+  const { email, user_id, first_name, last_name, profile_picture, dob, gender, phone_number, city, states } = req.body;
 
   pool.getConnection((err, connection) => {
     if (err) {
@@ -61,8 +61,8 @@ app.post('/UpdateProfile', (req, res) => {
     } else {
       // Use the connection to perform the query
       connection.query(
-        "UPDATE `User` SET `user_id` = ?, `first_name` = ?, `last_name` = ?, `profile_picture` = ?, `dob` = ?, `gender` = ?, `phone_number` = ? WHERE `email` = ?",
-        [user_id, first_name, last_name, profile_picture, dob, gender, phone_number, email],
+        "UPDATE `User` SET `user_id` = ?, `first_name` = ?, `last_name` = ?, `profile_picture` = ?, `dob` = ?, `gender` = ?, `phone_number` = ?, `city` = ?, `states` = ?, WHERE `email` = ?",
+        [user_id, first_name, last_name, profile_picture, dob, gender, phone_number, city, states, email],
         (err, result) => {
           // Release the connection back to the pool
           connection.release();

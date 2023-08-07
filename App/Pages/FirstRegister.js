@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Platform } from 'react-native-web';
 import Colors from '../Shared/Colors';
 import axios from 'axios';
-import { isValidEmail, isValidDateOfBirth } from './Validation';
+import { isValidEmail, isValidDateOfBirth, isValidPassword } from './Validation';
 import { useNavigation } from '@react-navigation/native';
 //import DatePicker from 'react-datepicker';
 //import 'react-datepicker/dist/react-datepicker.css';
@@ -24,25 +24,35 @@ const handleConfirmPasswordChange = (text) => {
  
 const handleFirstRegister = () => {
   if (!email || !confirmPassword || !password) {
-    setRegisterStatus('Please fill in all fields');
+    setRegisterStatus('Sila lengkapkan semua medan');
     return;
   }
   if (!isValidEmail(email)) {
-    setRegisterStatus('Please enter a valid email address');
+    setRegisterStatus('Sila masukkan alamat emel yang sah.');
     return;
   }
 
-  // Add form validation for password
-  if (password.length < 7) {
-    setRegisterStatus('Password must be at least 8 characters long');
-    return;
-  }
 
   if (password !== confirmPassword) {
-    setRegisterStatus('Passwords do not match');
+    setRegisterStatus('Kata laluan tidak sama');
     return;
   }
+  const passwordValidationResult = isValidPassword(password);
+    if (!passwordValidationResult.isValid) {
+    let errorMessage = 'Sila masukkan kata laluan yang kuat dengan:';
+    const { requirements } = passwordValidationResult;
+    if (!requirements.length) errorMessage += ' sekurang-kurangnya 8 karakter,';
+    if (!requirements.uppercase) errorMessage += ' sekurang-kurangnya satu huruf besar,';
+    if (!requirements.lowercase) errorMessage += ' sekurang-kurangnya satu huruf kecil,';
+    if (!requirements.number) errorMessage += ' sekurang-kurangnya satu nombor,';
+    if (!requirements.specialCharacter) errorMessage += ' sekurang-kurangnya satu karakter khas (@$!%*?&),';
 
+    // Remove the trailing comma
+    errorMessage = errorMessage.replace(/,\s*$/, '');
+
+    setRegisterStatus(errorMessage);
+    return;
+  }
   axios
   .post('https://aktivai.web.app/register', {
     email: email,
@@ -82,20 +92,20 @@ const handleFirstRegister = () => {
       </View>
       <TextInput
         style={styles.input}
-        placeholder="Email Address"
+        placeholder="Alamat Emel"
         value={email}
         onChangeText={setEmail}
       />
       <TextInput
         style={styles.input}
-        placeholder="Password"
+        placeholder="Kata Laluan"
         secureTextEntry
         value={password}
         onChangeText={setPassword}
       />
       <TextInput
         style={styles.input}
-        placeholder="Confirm Password"
+        placeholder="Sahkan Kata Laluan"
         secureTextEntry
         value={confirmPassword}
         onChangeText={handleConfirmPasswordChange}
