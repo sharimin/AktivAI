@@ -32,27 +32,17 @@ const handleFirstRegister = () => {
     return;
   }
 
+  // Add form validation for password
+  if (password.length < 7) {
+    setRegisterStatus('Password must be at least 8 characters long');
+    return;
+  }
 
   if (password !== confirmPassword) {
-    setRegisterStatus('Kata laluan tidak sama');
+    setRegisterStatus('Passwords do not match');
     return;
   }
-  const passwordValidationResult = isValidPassword(password);
-    if (!passwordValidationResult.isValid) {
-    let errorMessage = 'Sila masukkan kata laluan yang kuat dengan:';
-    const { requirements } = passwordValidationResult;
-    if (!requirements.length) errorMessage += ' sekurang-kurangnya 8 karakter,';
-    if (!requirements.uppercase) errorMessage += ' sekurang-kurangnya satu huruf besar,';
-    if (!requirements.lowercase) errorMessage += ' sekurang-kurangnya satu huruf kecil,';
-    if (!requirements.number) errorMessage += ' sekurang-kurangnya satu nombor,';
-    if (!requirements.specialCharacter) errorMessage += ' sekurang-kurangnya satu karakter khas (@$!%*?&),';
 
-    // Remove the trailing comma
-    errorMessage = errorMessage.replace(/,\s*$/, '');
-
-    setRegisterStatus(errorMessage);
-    return;
-  }
   axios
   .post('https://aktivai.web.app/register', {
     email: email,
