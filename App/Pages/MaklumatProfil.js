@@ -52,6 +52,7 @@ const dropdownStyles = {
   borderWidth: 1,
   borderRadius: 5,
   paddingHorizontal: 10,
+  marginBottom: 12,
 };
   // Function to format the date to "MM/DD/YYYY" format
   const formatDate = (date) => {
@@ -188,7 +189,7 @@ if (!validateBio(bio)) {
       value={lastName}
       onChangeText={setLastName}
     />
-    <View style={styles.dropdownContainer}>
+    
     <DatePicker
       selected={dob}
       onChange={(date) => setDob(date)}
@@ -199,10 +200,10 @@ if (!validateBio(bio)) {
       yearDropdownItemNumber={100}
       style={dropdownStyles} // Apply the updated style to the DatePicker component
   />
-    </View>
     
     
-    <View style={styles.dropdownContainer}>
+    
+    
     <select
     style={dropdownStyles} // Apply the updated style to the select element
     value={gender}
@@ -216,16 +217,16 @@ if (!validateBio(bio)) {
       </option>
     ))}
   </select>
-</View>
+
     <TextInput
       style={styles.input}
       placeholder="No. Telefon"
       value={phoneNumber}
       onChangeText={setPhoneNumber}
     />
-    <View style={styles.dropdownContainer}>
+    
       <select
-        style={styles.dropdown}
+        style={dropdownStyles} 
         value={states}
         onChange={(e) => setStates(e.target.value)}
         className={styles.states} // Apply the style to the select element
@@ -237,7 +238,7 @@ if (!validateBio(bio)) {
           </option>
         ))}
       </select>
-    </View>
+    
     <TextInput
       style={styles.input}
       placeholder="Bandar"
@@ -245,9 +246,9 @@ if (!validateBio(bio)) {
       onChangeText={setCity}
     />
     {/* Add the dropdown for profession */}
-  <View style={styles.dropdownContainer}>
+  
     <select
-      style={styles.dropdown}
+      style={dropdownStyles} 
       value={profession}
       onChange={(e) => setProfession(e.target.value)}
     >
@@ -258,7 +259,7 @@ if (!validateBio(bio)) {
         </option>
       ))}
     </select>
-  </View>
+  
     <Button title="Kemaskini" onPress={handleRegister} />
     {registerStatus ? <Text>{registerStatus}</Text> : null}
   </View>
