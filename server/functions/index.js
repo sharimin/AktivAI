@@ -76,7 +76,7 @@ app.post('/UpdateProfile', (req, res) => {
     } else {
       // Use the connection to perform the query
       connection.query(
-        "UPDATE `User` SET `user_id` = ?, `first_name` = ?, `last_name` = ?, `profile_picture` = ?, `dob` = ?, `gender` = ?, `phone_number` = ?, `bio` = ?, `profession` = ?, `city` = ?, `states` = ?, WHERE `email` = ?",
+        "UPDATE `User` SET `user_id` = ?, `first_name` = ?, `last_name` = ?, `profile_picture` = ?, `dob` = ?, `gender` = ?, `phone_number` = ?, `bio` = ?, `profession` = ?, `city` = ?, `states` = ? WHERE `email` = ?",
         [user_id, first_name, last_name, profile_picture, dob, gender, phone_number, bio, profession, city, states, email],
         (err, result) => {
           // Release the connection back to the pool
@@ -99,6 +99,7 @@ app.post('/UpdateProfile', (req, res) => {
     }
   });
 });
+
 
 app.post('/sendVerificationCode', (req, res) => {
   const { email } = req.body;
