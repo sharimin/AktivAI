@@ -185,7 +185,7 @@ app.post('/verify', (req, res) => {
 
 app.get('/GetUserProfile', (req, res) => {
   const { email } = req.query; // Assuming you will pass the user's email as a query parameter
-
+  res.header('cache-control', 'no-store, no-cache, must-revalidate, proxy-revalidate', 'x-content-type-options', 'nosniff');
   pool.getConnection((err, connection) => {
     if (err) {
       console.log(err);
