@@ -101,6 +101,7 @@ if (!validateBio(bio)) {
         email: email,
         bio: bio,
         user_id: userId,
+        profile_picture: profilePicture,
         first_name: firstName,
         dob: dob ? formatDate(dob) : null,
         gender: gender,
