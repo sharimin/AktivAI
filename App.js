@@ -52,6 +52,7 @@ function App() {
             <Stack.Screen name="FirstRegister" component={FirstRegister} options={{ headerShown: false }} />
             <Stack.Screen name="MaklumatProfil" component={MaklumatProfil} />
             <Stack.Screen name="Success" component={Success} />
+            <Stack.Screen name="Profile" component={Profile} />
             </Stack.Navigator>
           </NavigationContainer>
           

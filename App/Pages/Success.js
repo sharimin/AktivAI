@@ -1,14 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native-web';
+import { View, Text, Button, StyleSheet } from 'react-native';
 import Colors from '../Shared/Colors';
 
-const Success = () => {
+const Success = ({ navigation }) => {
+  const navigateToProfile = () => {
+    navigation.navigate('Profile'); // Navigate to the 'Profile' screen
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tahniah!</Text>
       <Text style={styles.message}>
         Anda telah berjaya mendaftar akaun AKTIVAI.
       </Text>
+      <Button title="View Profile" onPress={navigateToProfile} />
     </View>
   );
 };

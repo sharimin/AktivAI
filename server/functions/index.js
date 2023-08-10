@@ -183,5 +183,33 @@ app.post('/verify', (req, res) => {
   });
 });
 
+app.get('/GetUserProfile', (req, res) => {
+  const { email } = req.query; // Assuming you will pass the user's email as a query parameter
 
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send({ success: false, message: "An error occurred while fetching user profile data." });
+    } else {
+      connection.query(
+        "SELECT first_name, last_name, profile_picture, bio, profession, city, states FROM User WHERE email = ?",
+        [email],
+        (err, result) => {
+          connection.release();
+          if (err) {
+            console.log(err);
+            res.status(500).send({ success: false, message: "An error occurred while fetching user profile data." });
+          } else {
+            if (result.length > 0) {
+              const userProfileData = result[0];
+              res.send({ success: true, data: userProfileData });
+            } else {
+              res.send({ success: false, message: "User profile data not found." });
+            }
+          }
+        }
+      );
+    }
+  });
+});
 exports.app = functions.https.onRequest(app);
