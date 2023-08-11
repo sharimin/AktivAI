@@ -15,6 +15,10 @@ import LoginOp from './App/Pages/LoginOp';
 import Success from './App/Pages/Success';
 import SuccessNavigation from './App/Navigations/SuccessNavigation';
 import RegisterNavigation from './App/Navigations/RegisterNavigation';
+import Introduction from './App/Pages/Introduction';
+import Scanner from './App/Screens/Scanner';
+import Achievement from './App/Pages/Achievement';
+import Agenda from './App/Pages/Agenda';
 
 
 export default 
@@ -48,11 +52,15 @@ function App() {
         ) : (
           <NavigationContainer>
             <Stack.Navigator>
-            
+            <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name="Introduction" component={Introduction} />
             <Stack.Screen name="FirstRegister" component={FirstRegister} options={{ headerShown: false }} />
             <Stack.Screen name="MaklumatProfil" component={MaklumatProfil} />
             <Stack.Screen name="Success" component={Success} />
             <Stack.Screen name="Profile" component={Profile} />
+            <Stack.Screen name="Scanner" component={Scanner} />
+            <Stack.Screen name="Achievement" component={Achievement} />
+            <Stack.Screen name="Agenda" component={Agenda} />
             </Stack.Navigator>
           </NavigationContainer>
           

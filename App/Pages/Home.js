@@ -19,19 +19,47 @@ export default function Home() {
     <View style={styles.container}>
       <View style={styles.contentContainer}>
         <WelcomeHeader />
-        <SearchBar />
-        <Slider />
+
+        {/* Button Group: Agenda, Pencapaian, Profil */}
+        <View style={styles.buttonGroupContainer}>
+          {/* Rounded Button: Agenda */}
+          <View style={styles.buttonWrapper}>
+            <TouchableOpacity
+              style={styles.roundedButton}
+              onPress={() => navigation.navigate('Agenda')}
+            />
+            <Text style={styles.buttonLabel}>Agenda</Text>
+          </View>
+          
+          {/* Rounded Button: Pencapaian */}
+          <View style={styles.buttonWrapper}>
+            <TouchableOpacity
+              style={styles.roundedButton}
+              onPress={() => navigation.navigate('Achievement')}
+            />
+            <Text style={styles.buttonLabel}>Pencapaian</Text>
+          </View>
+          
+          {/* Rounded Button: Profil */}
+          <View style={styles.buttonWrapper}>
+            <TouchableOpacity
+              style={styles.roundedButton}
+              onPress={() => navigation.navigate('Profile')}
+            />
+            <Text style={styles.buttonLabel}>Profil</Text>
+          </View>
+        </View>
+
         <Clock/>
         <DateComponent/>
+        <TouchableOpacity style={styles.scanButtonContainer} onPress={() => navigation.navigate('Scanner')}>
+          <Image
+            source={require('../Assets/Image/scan_button_pattern.png')}
+            style={styles.buttonImage}
+          />
+        </TouchableOpacity>
+        <Logout />
       </View>
-      <TouchableOpacity style={styles.scanButtonContainer} onPress={() => navigation.navigate('Scanner')}>
-        <Image
-          source={require('../Assets/Image/scan_button_pattern.png')}
-          style={styles.buttonImage}
-        />
-      </TouchableOpacity>
-      
-      <Logout />
     </View>
   );
 }
@@ -40,20 +68,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    justifyContent: 'space-between'
+    justifyContent: 'center', // Center vertically
+    alignItems: 'center', // Center horizontally
   },
   contentContainer: {
-    flex: 1
+    flex: 1,
+    alignItems: 'center', // Center horizontally
   },
   scanButtonContainer: {
-
-    width:150,
-    height:150,
-    borderRadius:75,
+    marginTop: 20, // Add margin
+    width: 150,
+    height: 150,
+    borderRadius: 75,
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
   },
   logoutButtonContainer: {
     marginTop: 20,
@@ -61,10 +91,50 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     borderRadius: 8,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   buttonImage: {
     width: '100%',
-    height: '100%'
-  }
+    height: '100%',
+  },
+  roundedButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+    backgroundColor: Colors.primary,
+  },
+  buttonText: {
+    color: Colors.white,
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  buttonContainer: {
+    flexDirection: 'row', // Stack buttons horizontally
+    justifyContent: 'space-between', // Space evenly
+    marginTop: 20,
+    width: '100%', // Make the container full width
+  },
+  buttonText: {
+    color: Colors.white,
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  buttonGroupContainer: {
+    flexDirection: 'column', // Stack buttons vertically
+    alignItems: 'center', // Center horizontally
+    marginTop: 20,
+  },
+  buttonWrapper: {
+    alignItems: 'center', // Center horizontally
+    marginVertical: 10,
+  },
+  buttonLabel: {
+    fontSize: 12,
+    fontWeight: 'light',
+  },
+
+
 });
