@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet, TextInput } from 'react-native-web';
+import { View, Text, Image, StyleSheet, TextInput, Button } from 'react-native';
 import React, { useContext, useState } from 'react';
 import Colors from '../Shared/Colors';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,9 +7,14 @@ import * as Google from 'expo-auth-session/providers/google';
 import { TouchableOpacity } from 'react-native-web';
 import { AuthContext } from '../Context/AuthContext';
 import Services from '../Shared/Services';
+import MaklumatProfil from './MaklumatProfil';
+import axios from 'axios';
+ 
+const Login = ({ navigation }) => {
 
-export default 
-function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loginStatus, setLoginStatus] = useState('');
 
   WebBrowser.maybeCompleteAuthSession();
   const [accessToken, setAccessToken] = useState();
@@ -41,36 +46,94 @@ function Login() {
       setLoginStatus('Please fill in all fields');
       return;
     }
-
+  
     // Add form empty email
-    if (email == null) {
-      setLoginStatus('Email cannot be empty');
+    if (!email) {
+      setLoginStatus('Username cannot be empty');
       return;
     }
     // Add form empty password
-    if (password == null) {
+    if (!password) {
       setLoginStatus('Password cannot be empty');
       return;
     }
-  }
+  
+    if (registerMode) {
+      // Assuming you want to perform registration logic
+      if (!isValidEmail(email)) {
+        setLoginStatus('Please enter a valid email address.');
+        return;
+      }
+  
+      if (!isValidPassword(password)) {
+        setLoginStatus('Please enter a valid password.');
+        return;
+      }
+  
+      // Add axios registration request here
+      axios
+        .post('https://aktivai.web.app/register', {
+          email: email,
+          password: password,
+        })
+        .then((response) => {
+          if (response.data.success) {
+            // Registration was successful
+            setLoginStatus('Registration successful! You can now log in.');
+            // Clear the email and password fields after successful registration
+            setEmail('');
+            setPassword('');
+          } else {
+            // An error occurred
+            setLoginStatus('An error occurred while registering. Please try again later.');
+          }
+        })
+        .catch((error) => {
+          // Handle errors here
+          console.error('Error occurred:', error);
+          setLoginStatus('An error occurred while registering. Please try again later.');
+        });
+    } else {
+      // Assuming you want to perform login logic
+      // Implement the login logic here
+      // You can use the same approach as the registration logic above
+      // ...
+    }
+  };
 
   return (
     <View>
       <Image source={require('./../Assets/Image/login.png')} />
       <View style={styles.container}>
-        <Text style={styles.welcomeText}>Welcome to AktivAI</Text>
-        <Text style={{ textAlign: 'center', marginTop: 80, fontSize: 20 }}>Login/Signup</Text>
+        <Text style={styles.welcomeTextTop}>Selamat Datang</Text>
+        <Text style={styles.welcomeTextBottom}>AktivAI</Text>
+        <TextInput
+          style={[styles.input, { alignSelf: 'center' }]}
+          placeholder="Alamat Emel"
+          value={email}
+          onChangeText={setEmail}
+        />
+        <TextInput
+          style={[styles.input, { alignSelf: 'center' }]}
+          placeholder="Kata Laluan"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+        />
+        <View style={styles.buttonContainer}> {/* Wrap the button in a container */}
+          <Button title="Login" onPress={handleLogin} />
+        </View>
+        <Text style={{ textAlign: 'center', marginTop: 80, fontSize: 20 }}>Atau</Text>
         <TouchableOpacity style={styles.button} onPress={() => promptAsync()}>
           <Ionicons name="logo-google" size={24} color="white" style={{ marginRight: 10 }} />
-          <Text style={{ color: Colors.white }}>Sign In with Google</Text>
+          <Text style={{ color: Colors.white }}>Log Masuk dengan Google</Text>
         </TouchableOpacity>
-        
+        <Text style={styles.registerText}>Belum ada Akaun? Tekan bawah</Text>
+        <Button title="Register" onPress={() => setRegisterMode(true)} />
       </View>
     </View>
-    
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     paddingTop: 40,
@@ -125,6 +188,29 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     color: 'white',
   },
+  welcomeTextTop: {
+    fontSize: 35,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+
+  welcomeTextBottom: {
+    fontSize: 35,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    color: Colors.darkYellow, // Set the color to dark yellow
+    marginBottom: 40, // Adjust the margin as needed
+  },
+  buttonContainer: {
+    marginTop: 20, // Adjust the margin as needed
+    alignItems: 'center', // Center the button horizontally
+  },
+  registerText: {
+    color: Colors.black,
+    textAlign: 'center',
+    marginBottom: 8, // Adjust the margin as needed
+  },
 });
 
 // Additional code for the Register section
@@ -136,3 +222,4 @@ const registerStyles = StyleSheet.create({
     // Your styles for the input component
   }
 });
+export default Login;

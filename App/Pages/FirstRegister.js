@@ -69,9 +69,6 @@ if (password !== confirmPassword) {
   setRegisterStatus('Kata laluan tidak sama');
   return;
 }
-
-
-
     // Remove the trailing comma
     errorMessage = errorMessage.replace(/,\s*$/, '');
 

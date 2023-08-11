@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql');
 const nodemailer = require('nodemailer');
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
 const app = express();
@@ -182,6 +182,54 @@ app.post('/verify', (req, res) => {
     }
   });
 });
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
+
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send({ success: false, message: "An error occurred while logging in. Please try again later." });
+    } else {
+      // Check if the email exists in the database
+      connection.query(
+        "SELECT `user_id`, `email`, `password` FROM `User` WHERE `email` = ?",
+        [email],
+        async (err, result) => {
+          if (err) {
+            console.log(err);
+            connection.release();
+            res.status(500).send({ success: false, message: "An error occurred while logging in. Please try again later." });
+          } else {
+            // Check if the email was found in the database
+            if (result.length === 0) {
+              connection.release();
+              res.send({ success: false, message: "Email not found. Please check your credentials." });
+            } else {
+              const storedPasswordHash = result[0].password;
+              try {
+                // Compare the provided password with the stored password hash
+                const passwordMatch = await bcrypt.compare(password, storedPasswordHash);
+                connection.release();
+                if (passwordMatch) {
+                  // Passwords match, login successful
+                  res.send({ success: true, message: "Login successful!" });
+                } else {
+                  // Passwords don't match, login failed
+                  res.send({ success: false, message: "Invalid password. Please check your credentials." });
+                }
+              } catch (compareError) {
+                // Error occurred during password comparison
+                console.log(compareError);
+                res.status(500).send({ success: false, message: "An error occurred while logging in. Please try again later." });
+              }
+            }
+          }
+        }
+      );
+    }
+  });
+});
+
 
 app.get('/GetUserProfile', (req, res) => {
   const { email } = req.query; // Assuming you will pass the user's email as a query parameter

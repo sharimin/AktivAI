@@ -11,9 +11,20 @@ import Logout from './Logout';
 import Clock from './Clock';
 import DateComponent from './DateComponent';
 
-export default function Home() {
+const Home = () => {
+  const navigation = useNavigation(); // Moved navigation hook to this component
+
+  const navigateToProfile = () => {
+    navigation.navigate('Profile');
+  };
+  const navigateToAgenda = () => {
+    navigation.navigate('Agenda');
+  };
+  const navigateToAchievement = () => {
+    navigation.navigate('Achievement');
+  };
   const { userData, setUserData } = useContext(AuthContext);
-  const navigation = useNavigation();
+
 
   return (
     <View style={styles.container}>
@@ -24,29 +35,29 @@ export default function Home() {
         <View style={styles.buttonGroupContainer}>
           {/* Rounded Button: Agenda */}
           <View style={styles.buttonWrapper}>
-            <TouchableOpacity
-              style={styles.roundedButton}
-              onPress={() => navigation.navigate('Agenda')}
-            />
-            <Text style={styles.buttonLabel}>Agenda</Text>
+              <TouchableOpacity style={styles.roundedButton} onPress={navigateToAgenda}>
+            {/* Rounded Button: Agenda */}
+            
+          </TouchableOpacity>
+          <Text style={styles.buttonLabel}>Agenda</Text>
           </View>
           
           {/* Rounded Button: Pencapaian */}
           <View style={styles.buttonWrapper}>
-            <TouchableOpacity
-              style={styles.roundedButton}
-              onPress={() => navigation.navigate('Achievement')}
-            />
-            <Text style={styles.buttonLabel}>Pencapaian</Text>
+          <TouchableOpacity style={styles.roundedButton} onPress={navigateToAchievement}>
+        {/* Rounded Button: Achievement */}
+        
+      </TouchableOpacity>
+      <Text style={styles.buttonLabel}>Achievement</Text>
           </View>
           
           {/* Rounded Button: Profil */}
           <View style={styles.buttonWrapper}>
-            <TouchableOpacity
-              style={styles.roundedButton}
-              onPress={() => navigation.navigate('Profile')}
-            />
-            <Text style={styles.buttonLabel}>Profil</Text>
+          <TouchableOpacity style={styles.roundedButton} onPress={navigateToProfile}>
+        {/* Rounded Button: Agenda */}
+        
+      </TouchableOpacity>
+      <Text style={styles.buttonLabel}>Profile</Text>
           </View>
         </View>
 
@@ -138,3 +149,6 @@ const styles = StyleSheet.create({
 
 
 });
+
+
+export default Home;

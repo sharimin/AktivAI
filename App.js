@@ -52,9 +52,10 @@ function App() {
         ) : (
           <NavigationContainer>
             <Stack.Navigator>
+            <Stack.Screen name="Introduction" component={Introduction} options={{ headerShown: false }}/>
+            <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Home" component={Home} />
-            <Stack.Screen name="Introduction" component={Introduction} />
-            <Stack.Screen name="FirstRegister" component={FirstRegister} options={{ headerShown: false }} />
+            <Stack.Screen name="FirstRegister" component={FirstRegister}  />
             <Stack.Screen name="MaklumatProfil" component={MaklumatProfil} />
             <Stack.Screen name="Success" component={Success} />
             <Stack.Screen name="Profile" component={Profile} />

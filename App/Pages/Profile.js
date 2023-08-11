@@ -1,34 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'; // Include TouchableOpacity
 import axios from 'axios';
 
-const Profile = () => {
-  const [userData, setUserData] = useState(null); // State to store user data
+const Profile = ({ navigation }) => {
+  const navigateToHome = () => {
+    navigation.navigate('Home'); // Navigate to the 'Home' screen
+  };
+  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
-    // Replace with the actual user's email
     const userEmail = 'sharimin.rashid@gmail.com';
 
-    // Make the Axios GET request
     axios.get('https://aktivai.web.app/GetUserProfile', {
       params: {
         email: userEmail,
       },
     })
     .then(response => {
-      // Handle successful response
-      setUserData(response.data); // Assuming the API returns user data
+      setUserData(response.data);
     })
     .catch(error => {
-      // Handle error
       console.error('Error retrieving user data:', error);
     });
-  }, []); // Empty dependency array means this effect runs only once, similar to componentDidMount
+  }, []);
 
-  // Render user profile information
   return (
     <View style={styles.container}>
-      {/* Display user data */}
       {userData && (
         <>
           <Text style={styles.name}>{`${userData.firstName} ${userData.lastName}`}</Text>
@@ -37,6 +34,9 @@ const Profile = () => {
           <Text style={styles.bio}>{userData.bio}</Text>
         </>
       )}
+      <TouchableOpacity onPress={navigateToHome} style={styles.backButton}>
+        <Text style={styles.backButtonText}>Back to Home</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -63,6 +63,21 @@ const styles = StyleSheet.create({
   },
   bio: {
     fontSize: 16,
+  },
+  messageText: {
+    fontSize: 18,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  backButton: {
+    backgroundColor: 'blue',
+    padding: 10,
+    borderRadius: 5,
+  },
+  backButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 
