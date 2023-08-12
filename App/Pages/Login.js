@@ -11,10 +11,13 @@ import MaklumatProfil from './MaklumatProfil';
 import axios from 'axios';
  
 const Login = ({ navigation }) => {
-
+  const navigateToHome = () => {
+    navigation.navigate('Home'); // Navigate to the 'Home' screen
+  };
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginStatus, setLoginStatus] = useState('');
+  const [registerMode, setRegisterMode] = useState(false);
 
   WebBrowser.maybeCompleteAuthSession();
   const [accessToken, setAccessToken] = useState();
@@ -41,7 +44,7 @@ const Login = ({ navigation }) => {
     }
   }
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email || !password) {
       setLoginStatus('Please fill in all fields');
       return;
@@ -72,32 +75,32 @@ const Login = ({ navigation }) => {
   
       // Add axios registration request here
       axios
-        .post('https://aktivai.web.app/register', {
+        .post('https://aktivai.web.app/login', {
           email: email,
           password: password,
         })
         .then((response) => {
           if (response.data.success) {
-            // Registration was successful
-            setLoginStatus('Registration successful! You can now log in.');
-            // Clear the email and password fields after successful registration
+            // Login was successful
+            setLoginStatus('Login successful!'); // You can customize the success message
+            // Set user data and perform necessary actions
+            setUserData(response.data.user); // Assuming the response contains user data
+            // Clear the email and password fields after successful login
             setEmail('');
             setPassword('');
+            // Navigate to the Home screen or perform other actions
+            navigation.navigate('Home');
+            navigateToHome();
           } else {
-            // An error occurred
-            setLoginStatus('An error occurred while registering. Please try again later.');
+            // Login failed
+            setLoginStatus('Invalid email or password. Please try again.');
           }
         })
         .catch((error) => {
           // Handle errors here
           console.error('Error occurred:', error);
-          setLoginStatus('An error occurred while registering. Please try again later.');
+          setLoginStatus('An error occurred while logging in. Please try again later.');
         });
-    } else {
-      // Assuming you want to perform login logic
-      // Implement the login logic here
-      // You can use the same approach as the registration logic above
-      // ...
     }
   };
 
@@ -105,8 +108,9 @@ const Login = ({ navigation }) => {
     <View>
       <Image source={require('./../Assets/Image/login.png')} />
       <View style={styles.container}>
-        <Text style={styles.welcomeTextTop}>Selamat Datang</Text>
+      <Text style={styles.welcomeTextTop}>Selamat Datang</Text>
         <Text style={styles.welcomeTextBottom}>AktivAI</Text>
+        
         <TextInput
           style={[styles.input, { alignSelf: 'center' }]}
           placeholder="Alamat Emel"
@@ -120,17 +124,17 @@ const Login = ({ navigation }) => {
           value={password}
           onChangeText={setPassword}
         />
-        <View style={styles.buttonContainer}> {/* Wrap the button in a container */}
-          <Button title="Login" onPress={handleLogin} />
-        </View>
+        
+        
+        <Button title="Login" onPress={() => { handleLogin()  }} />
         <Text style={{ textAlign: 'center', marginTop: 80, fontSize: 20 }}>Atau</Text>
         <TouchableOpacity style={styles.button} onPress={() => promptAsync()}>
           <Ionicons name="logo-google" size={24} color="white" style={{ marginRight: 10 }} />
           <Text style={{ color: Colors.white }}>Log Masuk dengan Google</Text>
         </TouchableOpacity>
         <Text style={styles.registerText}>Belum ada Akaun? Tekan bawah</Text>
-        <Button title="Register" onPress={() => setRegisterMode(true)} />
-      </View>
+        <Button title="Register" onPress={() => navigation.navigate('FirstRegister')} />
+        </View>
     </View>
   );
 }

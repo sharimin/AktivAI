@@ -7,15 +7,17 @@ import axios from 'axios';
 export default function Hello() {
   const { userData, setUserData } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(true);
-
+  const [firstName, setFirstName] = useState('');
+  const [email, setEmail] = useState('');
   useEffect(() => {
-    const userEmail = 'sharimin.rashid@gmail.com';
+    
 
     // Make the Axios GET request
     axios
       .get('https://aktivai.web.app/GetUserProfile', {
         params: {
-          email: userEmail,
+          email: email,
+          first_name: firstName,
         },
       })
       .then(response => {
@@ -57,7 +59,7 @@ export default function Hello() {
           />
           <Text>
             <Text style={{ fontSize: 20, fontWeight: 'bold' }}>HAI,</Text>{' '}
-            {userData.name}
+            {firstName} {/* Display the first_name here */}
           </Text>
           <Text>{greeting}</Text>
         </View>

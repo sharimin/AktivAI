@@ -25,40 +25,36 @@ const Home = () => {
   };
   const { userData, setUserData } = useContext(AuthContext);
 
-
   return (
     <View style={styles.container}>
       <View style={styles.contentContainer}>
-        <WelcomeHeader />
+       <WelcomeHeader />
 
-        {/* Button Group: Agenda, Pencapaian, Profil */}
+        {/* Button Group: Agenda, Achievement, Profile */}
         <View style={styles.buttonGroupContainer}>
-          {/* Rounded Button: Agenda */}
-          <View style={styles.buttonWrapper}>
-              <TouchableOpacity style={styles.roundedButton} onPress={navigateToAgenda}>
-            {/* Rounded Button: Agenda */}
-            
+          {/* Button: Agenda */}
+          <TouchableOpacity style={[styles.buttonWrapper, styles.buttonMargin]} onPress={() => navigation.navigate('Agenda')}>
+            <View style={styles.roundedButton}>
+              <Text style={styles.buttonLabel}>Agenda</Text>
+            </View>
+            <Text style={styles.buttonText}>Agenda</Text>
           </TouchableOpacity>
-          <Text style={styles.buttonLabel}>Agenda</Text>
-          </View>
           
-          {/* Rounded Button: Pencapaian */}
-          <View style={styles.buttonWrapper}>
-          <TouchableOpacity style={styles.roundedButton} onPress={navigateToAchievement}>
-        {/* Rounded Button: Achievement */}
-        
-      </TouchableOpacity>
-      <Text style={styles.buttonLabel}>Achievement</Text>
-          </View>
-          
-          {/* Rounded Button: Profil */}
-          <View style={styles.buttonWrapper}>
-          <TouchableOpacity style={styles.roundedButton} onPress={navigateToProfile}>
-        {/* Rounded Button: Agenda */}
-        
-      </TouchableOpacity>
-      <Text style={styles.buttonLabel}>Profile</Text>
-          </View>
+          {/* Button: Achievement */}
+          <TouchableOpacity style={[styles.buttonWrapper, styles.buttonMargin]} onPress={() => navigation.navigate('Achievement')}>
+            <View style={styles.roundedButton}>
+              <Text style={styles.buttonLabel}>Achievement</Text>
+            </View>
+            <Text style={styles.buttonText}>Achievement</Text>
+          </TouchableOpacity>
+
+          {/* Button: Profile */}
+          <TouchableOpacity style={styles.buttonWrapper} onPress={() => navigation.navigate('Profile')}>
+            <View style={styles.roundedButton}>
+              <Text style={styles.buttonLabel}>Profile</Text>
+            </View>
+            <Text style={styles.buttonText}>Profile</Text>
+          </TouchableOpacity>
         </View>
 
         <Clock/>
@@ -118,37 +114,26 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
   },
   buttonText: {
-    color: Colors.white,
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  buttonContainer: {
-    flexDirection: 'row', // Stack buttons horizontally
-    justifyContent: 'space-between', // Space evenly
-    marginTop: 20,
-    width: '100%', // Make the container full width
-  },
-  buttonText: {
-    color: Colors.white,
-    fontSize: 14,
-    fontWeight: 'bold',
+    color: Colors.black,
+    fontSize: 12,
+    fontWeight: 'light',
   },
   buttonGroupContainer: {
-    flexDirection: 'column', // Stack buttons vertically
+    flexDirection: 'row', // Stack buttons horizontally
     alignItems: 'center', // Center horizontally
+    justifyContent: 'space-between', // Space evenly
     marginTop: 20,
   },
   buttonWrapper: {
     alignItems: 'center', // Center horizontally
-    marginVertical: 10,
   },
   buttonLabel: {
     fontSize: 12,
     fontWeight: 'light',
   },
-
-
+  buttonMargin: {
+    marginHorizontal: 15, // Add horizontal margin between buttons
+  },
 });
-
 
 export default Home;

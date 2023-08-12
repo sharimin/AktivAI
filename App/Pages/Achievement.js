@@ -2,16 +2,16 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 const Achievement = ({ navigation }) => {
-  const navigateToProfile = () => {
-    navigation.navigate('Profile'); // Replace 'Profile' with the actual screen name of your profile screen
+  const navigateToHome = () => {
+    navigation.navigate('Home'); // Replace 'Profile' with the actual screen name of your profile screen
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.congratsText}>Congratulations!</Text>
       <Text style={styles.messageText}>You have earned your first NFT.</Text>
-      <TouchableOpacity onPress={navigateToProfile} style={styles.backButton}>
-        <Text style={styles.backButtonText}>Back to Profile</Text>
+      <TouchableOpacity onPress={navigateToHome} style={styles.backButton}>
+        <Text style={styles.backButtonText}>Back to Home</Text>
       </TouchableOpacity>
     </View>
   );
