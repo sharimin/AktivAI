@@ -1,5 +1,5 @@
 import React from 'react'
-import Scanner from '../Screens/Scanner';
+import Scanner from '../Components/Scanner.js';
 import Logout from '../Pages/Logout';
 import Success from '../Pages/Success';
 import { createStackNavigator } from '@react-navigation/stack';

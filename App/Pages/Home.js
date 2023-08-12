@@ -6,7 +6,7 @@ import { AuthContext } from '../Context/AuthContext';
 import WelcomeHeader from '../Components/WelcomeHeader';
 import Slider from '../Components/Slider';
 import SearchBar from '../Components/SearchBar';
-import Scanner from '../Screens/Scanner';
+import Scanner from '../Components/Scanner';
 import Logout from './Logout';
 import Clock from './Clock';
 import DateComponent from './DateComponent';

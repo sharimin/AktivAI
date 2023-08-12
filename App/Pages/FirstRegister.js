@@ -1,12 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Platform } from 'react-native-web';
-import Colors from '../Shared/Colors';
+import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Platform,Image } from 'react-native-web';
 import axios from 'axios';
+import { Svg, Rect } from 'react-native-svg';
 import { isValidEmail, isValidDateOfBirth, isValidPassword } from './Validation';
 import { useNavigation } from '@react-navigation/native';
-//import DatePicker from 'react-datepicker';
-//import 'react-datepicker/dist/react-datepicker.css';
-import DefaultProfilePicture from '../Assets/Image/aktivAI.png';
+import Vector from '../Assets/vectors/Vector.svg';
+import Vector2 from '../Assets/vectors/Vector2.svg';
+import logo5122 from '../Assets/Image/logo5122.png';
+import User from '../Assets/vectors/User.svg';
+import Lock from '../Assets/vectors/Lock.svg';
+import VuesaxLinearEyeSlash from '../Assets/vectors/VuesaxLinearEyeSlash.svg';
+import CommpanyIcon from '../Assets/vectors/CommpanyIcon.svg';
+import theme from '../theme.ts';
+
+
+
 
 
 const FirstRegister = () => {
@@ -103,120 +111,379 @@ if (password !== confirmPassword) {
 
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Daftar AKTIVAI</Text>
-      <View style={styles.profilePicture}>
-        <img src={DefaultProfilePicture} alt="Default Profile Picture" style={styles.profilePicture} />
+    <View style={styles.root}>
+    <View style={styles.frame162509}>
+      <View style={styles.group513845}>
+        {/* <Vector />
+        <Vector2 /> */}
+       <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <img src="https://github.com/Nikizzuan/TempSaveFIle/blob/main/Header.png?raw=true" style={{ width: '100%' }} />
+      </div>
       </View>
-      <TextInput
+    </View>
+    <View style={styles.frame513825}>
+    </View>
+    <Image source={{uri: logo5122}} style={{width: 123, height: 123}} contentFit="cover"/>
+    <View style={styles.maklumatProfilForm}>
+      <Text style={styles.emel}>
+        Emel
+      </Text>
+      <View style={styles.namaPertama}>
+        {/* <User /> */}
+        <div>
+      <img src="https://raw.githubusercontent.com/Nikizzuan/TempSaveFIle/5e9cf5d256e7855d488bbbe6b210f7424d857cac/vectors/User.svg"/>
+    </div>
+        
+        <TextInput
         style={styles.input}
+        
         placeholder="Alamat Emel"
         value={email}
         onChangeText={setEmail}
       />
-      <TextInput
+      </View>
+      <Text style={styles.kataLaluan}>
+        Kata laluan
+      </Text>
+      <View style={styles.namaPertama2}>
+        {/* <Lock /> */}
+        <div>
+      <img src="https://raw.githubusercontent.com/Nikizzuan/TempSaveFIle/5e9cf5d256e7855d488bbbe6b210f7424d857cac/vectors/Lock.svg"/>
+    </div>
+        <View style={styles.frame513845}>
+        <TextInput
         style={styles.input}
-        placeholder="Kata Laluan"
+        placeholder="********"
         secureTextEntry
         value={password}
         onChangeText={setPassword}
       />
-      <TextInput
+          <View style={styles.eyeSlash}>
+            {/* <VuesaxLinearEyeSlash /> */}
+            
+          </View>
+        </View>
+      </View>
+      <Text style={styles.sahkanKataLaluan}>
+        Sahkan kata laluan
+      </Text>
+      <View style={styles.namaPertama3}>
+        {/* <Lock /> */}
+        <div>
+      <img src="https://raw.githubusercontent.com/Nikizzuan/TempSaveFIle/5e9cf5d256e7855d488bbbe6b210f7424d857cac/vectors/Lock.svg"/>
+    </div>
+        <View style={styles.frame5138452}>
+        <TextInput
         style={styles.input}
-        placeholder="Sahkan Kata Laluan"
+        placeholder="********"
         secureTextEntry
         value={confirmPassword}
         onChangeText={handleConfirmPasswordChange}
       />
-      
-      <Button title="Register" onPress={handleFirstRegister} />
-    {registerStatus ? <Text>{registerStatus}</Text> : null}
+          <View style={styles.eyeSlash2}>
+            {/* <VuesaxLinearEyeSlash /> */}
+          </View>
+        </View>
+      </View>
     </View>
+    <View  style={styles.namaTerakhir}>
+    <TouchableOpacity
+    style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+    onPress={handleFirstRegister}>
+    <Text style={styles.daftar}>Daftar</Text>
+  </TouchableOpacity>
+    </View>
+    {registerStatus ? <Text>{registerStatus}</Text> : null}
+
+    <Text style={styles.denganMenekanButangDaftarAndaBersetujuDenganTermaDanSyaratAktivAiSertaMengakuiDasarPrivasiMereka}>
+      Dengan menekan butang daftar, anda bersetuju dengan Terma dan syarat Aktiv.ai serta mengakui Dasar Privasi mereka.
+    </Text>
+  </View>
   );
 };
 
+// {/* <View style={styles.frame513846}>
+// <Text style={styles.label}>
+//   atau
+// </Text>
+// </View>
+// <View style={styles.buttonGoogle}>
+// <View style={styles.button}>
+//   {/* <CommpanyIcon /> */}
+//   <div>
+// <img src="https://raw.githubusercontent.com/Nikizzuan/TempSaveFIle/5e9cf5d256e7855d488bbbe6b210f7424d857cac/vectors/CommpanyIcon.svg"/>
+//  </div>
+//   <Text style={styles.daftarDenganGoogle}>
+//     Daftar dengan Google
+//   </Text>
+// </View>
+// </View> */}
+
 const styles = StyleSheet.create({
-  container: {
+  input:  {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
-  input: {
-    width: '80%',
-    height: 40,
-    borderColor: Colors.primary,
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 12,
-  },
-  radioButtonsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  radioButton: {
-    marginLeft: 8,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderColor: Colors.primary,
-    borderWidth: 1,
-    borderRadius: 5,
-  },
-  radioLogo: {
-    width: 20, 
-    height: 20,
-    marginRight: 8,
-  }, 
-  radioButtonSelected: {
-    backgroundColor: Colors.primary,
-    color: 'white',
-  },
-  'datepicker-input': {
-    width: '80%',
-    height: 40,
-    borderColor: Colors.primary,
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 12,
-  },
-  chooseProfilePictureButton: {
-    width: 200,
-    height: 200,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    borderWidth: 1,
-    borderColor: Colors.primary,
-    borderRadius: 5,
-  },
-  chooseProfilePictureButtonText: {
-    color: Colors.primary,
-    fontSize: 16,
-  },
-  
-  profilePictureFrame: {
-    border: '5px solid #ffffff',
-    boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
-    borderRadius: '50%',
-    overflow: 'hidden',
-    marginBottom: 16,
-    width: 100, // Adjust the width of the frame
-    height: 100, // Adjust the height of the frame
+     justifyContent: 'center', 
+     alignItems: 'center'
   },
 
-  profilePicture: {
-    width: '100%',
-    height: '100%',
-    width: 200, // Adjust the width of the frame
-    height: 200,
-    objectFit: 'cover', // Ensure the picture fills the frame without stretching
+  root: {
+    width: 375,
+    paddingTop: 0,
+    paddingBottom: 56,
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 16,
+    backgroundColor: '#FFF',
+    paddingHorizontal: 16,
+  },
+  frame162509: {
+    width: 375,
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 10,
+    position: 'absolute',
+    top: -12,
+  },
+  group513845: {
+    width: 529,
+    height: 121,
+  },
+  frame513825: {
+    height: 93,
+    paddingTop: 72,
+    alignItems: 'center',
+    gap: 12,
+    alignSelf: 'stretch',
+    flexDirection: 'row',
+  },
+  logo5122: {
+    width: 123,
+    height: 123,
+  },
+  emel: {
+    color: theme.colors.black.$01,
+    fontFamily: 'Avenir',
+    fontSize: 14,
+    fontStyle: 'normal',
+    fontWeight: '400',
+    lineHeight: '130% /* 18.2px */',
+  },
+  user: {
+    width: 24,
+    height: 24,
+  },
+  masukkanEmel: {
+    color: theme.colors.grayscale.light_text,
+    fontFamily: 'Avenir',
+    fontSize: 14,
+    fontStyle: 'normal',
+    fontWeight: '400',
+    lineHeight: '24px /* 171.429% */',
+  },
+  maklumatProfilForm: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: 12,
+    alignSelf: 'stretch',
+    paddingVertical: 8,
+    paddingHorizontal: 0,
+  },
+  namaPertama: {
+    height: 51,
+    alignItems: 'center',
+    gap: 8,
+    alignSelf: 'stretch',
+    borderWidth: 1,
+    borderColor: theme.colors.grayscale.gray_bg,
+    borderStyle: 'solid',
+    backgroundColor: theme.colors.grayscale.white,
+    flexDirection: 'row',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 50,
+  },
+  kataLaluan: {
+    color: theme.colors.black.$01,
+    fontFamily: 'Avenir',
+    fontSize: 14,
+    fontStyle: 'normal',
+    fontWeight: '400',
+    lineHeight: '130% /* 18.2px */',
+  },
+  lock: {
+    width: 24,
+    height: 24,
+  },
+  $1691770592471: {
+    color: theme.colors.grayscale.light_text,
+    fontFamily: 'Plus Jakarta Sans',
+    fontSize: 14,
+    fontStyle: 'normal',
+    fontWeight: '500',
+    lineHeight: '160% /* 22.4px */',
+  },
+  vuesaxLinearEyeSlash: {
+    width: 24,
+    height: 24,
+  },
+  namaPertama2: {
+    height: 51,
+    alignItems: 'center',
+    gap: 8,
+    alignSelf: 'stretch',
+    borderWidth: 1,
+    borderColor: theme.colors.grayscale.gray_bg,
+    borderStyle: 'solid',
+    backgroundColor: theme.colors.grayscale.white,
+    flexDirection: 'row',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 50,
+  },
+  frame513845: {
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexGrow: 1,
+    flexShrink: 0,
+    flexBasis: 0,
+    flexDirection: 'row',
+  },
+  eyeSlash: {
+    alignItems: 'flex-start',
+    gap: 10,
+    flexDirection: 'row',
+  },
+  sahkanKataLaluan: {
+    color: theme.colors.black.$01,
+    fontFamily: 'Avenir',
+    fontSize: 14,
+    fontStyle: 'normal',
+    fontWeight: '400',
+    lineHeight: '130% /* 18.2px */',
+  },
+  lock2: {
+    width: 24,
+    height: 24,
+  },
+  $1691770592596: {
+    color: theme.colors.grayscale.light_text,
+    fontFamily: 'Plus Jakarta Sans',
+    fontSize: 14,
+    fontStyle: 'normal',
+    fontWeight: '500',
+    lineHeight: '160% /* 22.4px */',
+  },
+  vuesaxLinearEyeSlash2: {
+    width: 24,
+    height: 24,
+  },
+  namaPertama3: {
+    height: 51,
+    alignItems: 'center',
+    gap: 8,
+    alignSelf: 'stretch',
+    borderWidth: 1,
+    borderColor: theme.colors.grayscale.gray_bg,
+    borderStyle: 'solid',
+    backgroundColor: theme.colors.grayscale.white,
+    flexDirection: 'row',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 50,
+  },
+  frame5138452: {
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexGrow: 1,
+    flexShrink: 0,
+    flexBasis: 0,
+    flexDirection: 'row',
+  },
+  eyeSlash2: {
+    alignItems: 'flex-start',
+    gap: 10,
+    flexDirection: 'row',
+  },
+  daftar: {
+    color: '#FFF',
+    fontFamily: 'Avenir',
+    fontSize: 14,
+    fontStyle: 'normal',
+    fontWeight: '800',
+    lineHeight: '24px /* 171.429% */',
+  },
+  namaTerakhir: {
+    height: 51,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+    alignSelf: 'stretch',
+    borderWidth: 1,
+    borderColor: theme.colors.grayscale.gray_bg,
+    borderStyle: 'solid',
+    backgroundColor: '#EFC52E',
+    flexDirection: 'row',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 50,
+  },
+  label: {
+    color: theme.colors.black.$60,
+    textAlign: 'center',
+    fontFeatureSettings: '\'clig\' off, \'liga\' off',
+    fontFamily: 'Avenir',
+    fontSize: 14,
+    fontStyle: 'normal',
+    fontWeight: '400',
+    lineHeight: '24px /* 171.429% */',
+    letterSpacing: 0.014,
+  },
+  frame513846: {
+    alignItems: 'center',
+    gap: 8,
+    alignSelf: 'stretch',
+    flexDirection: 'row',
+  },
+  commpanyIcon: {
+    width: 24,
+    height: 24,
+  },
+  daftarDenganGoogle: {
+    color: theme.colors.black.$01,
+    textAlign: 'center',
+    fontFamily: 'Avenir',
+    fontSize: 14,
+    fontStyle: 'normal',
+    fontWeight: '800',
+    lineHeight: '130% /* 18.2px */',
+  },
+  buttonGoogle: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: 15,
+  },
+  button: {
+    paddingRight: 89,
+    paddingLeft: 14,
+    alignItems: 'center',
+    gap: 52,
+    borderWidth: 1.5,
+    borderColor: '#F2F2F2',
+    borderStyle: 'solid',
+    flexDirection: 'row',
+    paddingVertical: 12,
+    borderRadius: 40,
+  },
+  denganMenekanButangDaftarAndaBersetujuDenganTermaDanSyaratAktivAiSertaMengakuiDasarPrivasiMereka: {
+    width: 304,
+    height: 63,
+    color: theme.colors.additional.colors_light_text_1,
+    textAlign: 'center',
+    fontFamily: 'Avenir',
+    fontSize: 12,
+    fontStyle: 'normal',
+    fontWeight: '800',
+    lineHeight: 20,
   },
 });
 

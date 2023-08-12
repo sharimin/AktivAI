@@ -7,6 +7,10 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
 const app = express();
+
+const jwt = require('jsonwebtoken');
+const secret = 'your_jwt_secret';
+
 app.use(cors());
 app.use(express.json());
 
@@ -182,6 +186,7 @@ app.post('/verify', (req, res) => {
     }
   });
 });
+
 app.post('/login', (req, res) => {
   const { email, password } = req.body;
 
@@ -212,7 +217,9 @@ app.post('/login', (req, res) => {
                 connection.release();
                 if (passwordMatch) {
                   // Passwords match, login successful
-                  res.send({ success: true, message: "Login successful!" });
+                  // Generate a JWT and send it back to the app
+                  const token = jwt.sign({ email: email }, secret);
+                  res.send({ success: true, message: "Login successful!", sessionToken: token });
                 } else {
                   // Passwords don't match, login failed
                   res.send({ success: false, message: "Invalid password. Please check your credentials." });

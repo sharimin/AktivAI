@@ -16,13 +16,22 @@ import Success from './App/Pages/Success';
 import SuccessNavigation from './App/Navigations/SuccessNavigation';
 import RegisterNavigation from './App/Navigations/RegisterNavigation';
 import Introduction from './App/Pages/Introduction';
-import Scanner from './App/Screens/Scanner';
+import Scanner from './App/Components/Scanner';
 import Achievement from './App/Pages/Achievement';
 import Agenda from './App/Pages/Agenda';
 
+function isMobileDevice() {
+  const maxMobileWidth = 767; // maximum screen width for mobile devices
+  const screenWidth = window.screen.width;
+  return (
+    /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) &&
+   // !/Tablet|Pad|Mobile/i.test(navigator.userAgent) &&
+    screenWidth <= maxMobileWidth
+  );
+}
 
-export default 
-function App() {
+
+export default function App() {
   const Stack = createStackNavigator();
   const [userData, setUserData] = useState();
 
@@ -42,6 +51,16 @@ function App() {
     setUserData(null); // Reset the user data to null
   };
 
+  // if (!isMobileDevice()) {
+  //   return (
+  //     <View style={styles.container}>
+  //       <Text style={styles.text}>
+  //         Please use a mobile device to access this app.
+  //       </Text>
+  //     </View>
+  //   );
+  // }
+
   return (
     <View style={styles.container}>
       <AuthContext.Provider value={{ userData, setUserData, handleLogout }}>
@@ -52,9 +71,9 @@ function App() {
         ) : (
           <NavigationContainer>
             <Stack.Navigator>
-              <Stack.Screen name="Home" component={Home} />
-              <Stack.Screen name="Introduction" component={Introduction} options={{ headerShown: false }}/>
-              <Stack.Screen name="Login" component={Login} />
+            <Stack.Screen name="Introduction" component={Introduction} options={{ headerShown: false }}/>
+            <Stack.Screen name="Login" component={Login} options={{ headerShown: false }}/>
+            <Stack.Screen name="Home" component={Home} options={{ headerShown: false }}/>
               <Stack.Screen name="FirstRegister" component={FirstRegister}  />
               <Stack.Screen name="MaklumatProfil" component={MaklumatProfil} />
               <Stack.Screen name="Success" component={Success} />
@@ -86,5 +105,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F6F8FC',
+  },
+  text: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    margin: 20,
   },
 });
