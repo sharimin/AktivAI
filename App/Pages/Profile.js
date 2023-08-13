@@ -7,6 +7,9 @@ const Profile = ({ navigation }) => {
   const navigateToHome = () => {
     navigation.navigate('Home'); // Navigate to the 'Home' screen
   };
+  const navigateToScan = () => {
+    navigation.navigate('HtmlScanner'); // Navigate to the 'Home' screen
+  };
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
@@ -55,6 +58,9 @@ const Profile = ({ navigation }) => {
       )}
       <TouchableOpacity onPress={navigateToHome} style={styles.backButton}>
         <Text style={styles.backButtonText}>Back to Home</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={navigateToScan} style={styles.backButton}>
+        <Text style={styles.backButtonText}>Scanner</Text>
       </TouchableOpacity>
     </View>
   );

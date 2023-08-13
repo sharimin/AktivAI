@@ -23,17 +23,20 @@ const Home = () => {
   const navigateToAchievement = () => {
     navigation.navigate('Achievement');
   };
+  const navigateToScan = () => {
+    navigation.navigate('HtmlScanner'); // Navigate to the 'Home' screen
+  };
   const { userData, setUserData } = useContext(AuthContext);
 
   return (
     <View style={styles.container}>
       <View style={styles.contentContainer}>
-       <WelcomeHeader />
+       {/* <WelcomeHeader /> */}
 
         {/* Button Group: Agenda, Achievement, Profile */}
         <View style={styles.buttonGroupContainer}>
           {/* Button: Agenda */}
-          <TouchableOpacity style={[styles.buttonWrapper, styles.buttonMargin]} onPress={() => navigation.navigate('Agenda')}>
+          <TouchableOpacity style={[styles.buttonWrapper, styles.buttonMargin]} onPress={navigateToAgenda}>
             <View style={styles.roundedButton}>
               <Text style={styles.buttonLabel}>Agenda</Text>
             </View>
@@ -41,7 +44,7 @@ const Home = () => {
           </TouchableOpacity>
           
           {/* Button: Achievement */}
-          <TouchableOpacity style={[styles.buttonWrapper, styles.buttonMargin]} onPress={() => navigation.navigate('Achievement')}>
+          <TouchableOpacity style={[styles.buttonWrapper, styles.buttonMargin]} onPress={navigateToAchievement}>
             <View style={styles.roundedButton}>
               <Text style={styles.buttonLabel}>Achievement</Text>
             </View>
@@ -49,7 +52,7 @@ const Home = () => {
           </TouchableOpacity>
 
           {/* Button: Profile */}
-          <TouchableOpacity style={styles.buttonWrapper} onPress={() => navigation.navigate('Profile')}>
+          <TouchableOpacity style={styles.buttonWrapper} onPress={() => navigateToProfile()}>
             <View style={styles.roundedButton}>
               <Text style={styles.buttonLabel}>Profile</Text>
             </View>
@@ -59,9 +62,9 @@ const Home = () => {
 
         <Clock/>
         <DateComponent/>
-        <TouchableOpacity style={styles.scanButtonContainer} onPress={() => navigation.navigate('Scanner')}>
+        <TouchableOpacity style={styles.scanButtonContainer} onPress={navigateToScan}>
           <Image
-            source={require('../Assets/Image/scan_button_pattern.png')}
+            source={require('../Assets/Image/daftar_scan.png')}
             style={styles.buttonImage}
           />
         </TouchableOpacity>
@@ -133,6 +136,11 @@ const styles = StyleSheet.create({
   },
   buttonMargin: {
     marginHorizontal: 15, // Add horizontal margin between buttons
+  },
+  backButton: {
+    backgroundColor: 'blue',
+    padding: 10,
+    borderRadius: 5,
   },
 });
 
