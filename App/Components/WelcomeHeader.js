@@ -9,7 +9,7 @@ export default function Hello() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const userEmail = 'xtest@gmail.com';
+    const userEmail = 'sharimin.rashid@gmail.com';
     axios
       .get('https://aktivai.web.app/GetUserProfile', {
         params: {
@@ -40,8 +40,9 @@ export default function Hello() {
     greeting = 'Selamat Malam';
   }
 
-  // Extract the first name from userData or use a default value
+  // Extract the first name and profile picture from userData or use default values
   const firstName = userData?.data?.first_name || 'No First Name';
+  const profilePicture = userData?.data?.profile_picture || DefaultProfilePicture;
 
   // Render user profile information
   return (
@@ -49,16 +50,19 @@ export default function Hello() {
       {isLoading ? (
         <Text>Loading...</Text>
       ) : userData ? (
-        <View>
-          <Image
-            source={{ uri: userData.data.picture || DefaultProfilePicture }}
-            style={{ width: 70, height: 70, borderRadius: 100 }}
-          />
-          <Text>
-            <Text style={{ fontSize: 20, fontWeight: 'bold' }}>HAI,</Text>{' '}
-            {firstName}
-          </Text>
-          <Text>{greeting}</Text>
+        <View style={styles.userInfo}>
+          <View style={styles.greetingContainer}>
+            <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
+              HAI, {firstName}
+            </Text>
+            <Text style={styles.greeting}>{greeting}</Text>
+          </View>
+          <View style={styles.profilePictureContainer}>
+            <Image
+              source={{ uri: profilePicture }}
+              style={styles.profilePicture}
+            />
+          </View>
         </View>
       ) : (
         <Text>No user data available</Text>
@@ -73,5 +77,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  userInfo: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  greetingContainer: {
+    marginRight: 16, // Adjust the margin as needed
+  },
+  greeting: {
+    fontSize: 16,
+    color: 'gray',
+  },
+  profilePictureContainer: {
+    borderWidth: 3, // Border width
+    borderColor: '#888', // Border color
+    borderRadius: 100, // Border radius for circular shape
+    overflow: 'hidden', // Ensure the image is clipped within the border
+  },
+  profilePicture: {
+    width: 70,
+    height: 70,
   },
 });

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import axios from 'axios';
+import DefaultProfilePicture from '../Assets/Image/aktivAI.png';
 
 const Profile = ({ navigation }) => {
   const navigateToHome = () => {
@@ -9,7 +10,7 @@ const Profile = ({ navigation }) => {
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
-    const userEmail = 'xtest@gmail.com';
+    const userEmail = 'sharimin.rashid@gmail.com';
 
     axios
       .get('https://aktivai.web.app/GetUserProfile', {
@@ -24,7 +25,7 @@ const Profile = ({ navigation }) => {
         if (response.data.success && response.data.data) {
           setUserData(response.data.data);
         } else {
-          console.warn('API response does not have expected structure');
+          console.warn('API response does not have the expected structure');
         }
       })
       .catch((error) => {
@@ -34,11 +35,16 @@ const Profile = ({ navigation }) => {
 
   console.log('userData:', userData);
 
-
   return (
     <View style={styles.container}>
       {userData ? (
         <>
+          <View style={styles.profilePictureContainer}>
+            <Image
+              source={{ uri: userData.profile_picture || DefaultProfilePicture }}
+              style={styles.profilePicture}
+            />
+          </View>
           <Text style={styles.name}>{`${userData.first_name} ${userData.last_name}`}</Text>
           <Text style={styles.profession}>{userData.profession}</Text>
           <Text style={styles.location}>{`${userData.city}, ${userData.states}`}</Text>
@@ -53,10 +59,24 @@ const Profile = ({ navigation }) => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     padding: 20,
     backgroundColor: '#f0f0f0',
+  },
+  profilePictureContainer: {
+    width: 70,
+    height: 70,
+    borderRadius: 100,
+    borderWidth: 3,
+    borderColor: '#888',
+    overflow: 'hidden',
+    marginBottom: 10,
+  },
+  profilePicture: {
+    width: '100%',
+    height: '100%',
   },
   name: {
     fontSize: 24,
