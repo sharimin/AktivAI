@@ -88,8 +88,8 @@ const dropdownStyles = {
     }
 
     // Add form validation for phone number
-  if (phoneNumber.length <= 9) {
-    setRegisterStatus('Nombor telefon mestilah lebih daripada 9 digit dengan atau tanpa +6');
+  if (phoneNumber.length <= 7) {
+    setRegisterStatus('Nombor telefon mestilah lebih daripada 8 digit dengan atau tanpa +6');
     return;
   }
   // Validation for city and states (begin with a capital letter)

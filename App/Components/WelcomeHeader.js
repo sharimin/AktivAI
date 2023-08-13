@@ -7,31 +7,25 @@ import axios from 'axios';
 export default function Hello() {
   const { userData, setUserData } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(true);
-  const [firstName, setFirstName] = useState('');
-  const [email, setEmail] = useState('');
-  useEffect(() => {
-    
 
-    // Make the Axios GET request
+  useEffect(() => {
+    const userEmail = 'xtest@gmail.com';
     axios
       .get('https://aktivai.web.app/GetUserProfile', {
         params: {
-          email: email,
-          first_name: firstName,
+          email: userEmail,
         },
       })
       .then(response => {
-        // Handle successful response
+        console.log('API response:', response.data);
         setUserData(response.data);
+        setIsLoading(false);
       })
       .catch(error => {
-        // Handle error
         console.error('Error retrieving user data:', error);
-      })
-      .finally(() => {
-        setIsLoading(false); // Set loading state to false after request completes
+        setIsLoading(false);
       });
-  }, []);
+  }, [setUserData]);
 
   // Determine the greeting based on the time
   const currentTime = new Date();
@@ -46,6 +40,9 @@ export default function Hello() {
     greeting = 'Selamat Malam';
   }
 
+  // Extract the first name from userData or use a default value
+  const firstName = userData?.data?.first_name || 'No First Name';
+
   // Render user profile information
   return (
     <View style={styles.container}>
@@ -54,12 +51,12 @@ export default function Hello() {
       ) : userData ? (
         <View>
           <Image
-            source={{ uri: userData.picture || DefaultProfilePicture }}
+            source={{ uri: userData.data.picture || DefaultProfilePicture }}
             style={{ width: 70, height: 70, borderRadius: 100 }}
           />
           <Text>
             <Text style={{ fontSize: 20, fontWeight: 'bold' }}>HAI,</Text>{' '}
-            {firstName} {/* Display the first_name here */}
+            {firstName}
           </Text>
           <Text>{greeting}</Text>
         </View>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'; // Include TouchableOpacity
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 
 const Profile = ({ navigation }) => {
@@ -9,30 +9,43 @@ const Profile = ({ navigation }) => {
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
-    const userEmail = 'sharimin.rashid@gmail.com';
+    const userEmail = 'xtest@gmail.com';
 
-    axios.get('https://aktivai.web.app/GetUserProfile', {
-      params: {
-        email: userEmail,
-      },
-    })
-    .then(response => {
-      setUserData(response.data);
-    })
-    .catch(error => {
-      console.error('Error retrieving user data:', error);
-    });
+    axios
+      .get('https://aktivai.web.app/GetUserProfile', {
+        params: {
+          email: userEmail,
+        },
+      })
+      .then((response) => {
+        console.log('API response:', response.data);
+
+        // Check if the response has the expected structure
+        if (response.data.success && response.data.data) {
+          setUserData(response.data.data);
+        } else {
+          console.warn('API response does not have expected structure');
+        }
+      })
+      .catch((error) => {
+        console.error('Error retrieving user data:', error);
+      });
   }, []);
+
+  console.log('userData:', userData);
+
 
   return (
     <View style={styles.container}>
-      {userData && (
+      {userData ? (
         <>
-          <Text style={styles.name}>{`${userData.firstName} ${userData.lastName}`}</Text>
+          <Text style={styles.name}>{`${userData.first_name} ${userData.last_name}`}</Text>
           <Text style={styles.profession}>{userData.profession}</Text>
-          <Text style={styles.location}>{`${userData.city}, ${userData.state}`}</Text>
+          <Text style={styles.location}>{`${userData.city}, ${userData.states}`}</Text>
           <Text style={styles.bio}>{userData.bio}</Text>
         </>
+      ) : (
+        <Text style={styles.messageText}>Loading...</Text>
       )}
       <TouchableOpacity onPress={navigateToHome} style={styles.backButton}>
         <Text style={styles.backButtonText}>Back to Home</Text>
@@ -40,7 +53,6 @@ const Profile = ({ navigation }) => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     padding: 20,
