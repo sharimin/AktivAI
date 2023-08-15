@@ -201,7 +201,7 @@ const getUserDataFromServer = async (sessionToken) => {
         <TextInput
         style={styles.input}
         
-        placeholder="Alamat Emel"
+        placeholder="ahmad@contoh.com"
         value={email}
         onChangeText={setEmail}
       />
@@ -253,6 +253,19 @@ const getUserDataFromServer = async (sessionToken) => {
   </View>
   );
 }
+const emailInputStyle = {
+  flex: 1,
+  justifyContent: 'center', 
+  alignItems: 'center',
+  color: 'gray', // Set the text color to gray
+};
+
+const passwordInputStyle = {
+  flex: 1,
+  justifyContent: 'center', 
+  alignItems: 'center',
+  color: 'gray', // Set the text color to gray
+};
 const styles = StyleSheet.create({
 
   input:  {

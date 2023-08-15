@@ -17,6 +17,7 @@ import theme from '../theme.ts';
 
 
 
+
 const FirstRegister = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -47,15 +48,14 @@ const handleFirstRegister = () => {
     return;
   }
   const passwordValidationResult = isValidPassword(password);
-    if (!passwordValidationResult.isValid) {
+  if (!passwordValidationResult.isValid) {
     let errorMessage = 'Sila masukkan kata laluan yang kuat dengan:';
     const { requirements } = passwordValidationResult;
     if (!requirements.length) errorMessage += ' sekurang-kurangnya 8 karakter,';
     if (!requirements.uppercase) errorMessage += ' sekurang-kurangnya satu huruf besar,';
     if (!requirements.lowercase) errorMessage += ' sekurang-kurangnya satu huruf kecil,';
     if (!requirements.number) errorMessage += ' sekurang-kurangnya satu nombor,';
-    if (!requirements.specialCharacter) errorMessage += ' sekurang-kurangnya satu karakter khas (@$!%*?&),';
-
+    if (!requirements.specialCharacter) errorMessage += ' sekurang-kurangnya satu karakter khas (@$!%*?&_),';
  
  // Add form validation for password
 if (password.length < 8) {
@@ -83,6 +83,7 @@ if (password !== confirmPassword) {
     setRegisterStatus(errorMessage);
     return;
   }
+  
   axios
   .post('https://aktivai.web.app/register', {
     email: email,
@@ -137,7 +138,7 @@ if (password !== confirmPassword) {
         <TextInput
         style={styles.input}
         
-        placeholder="Alamat Emel"
+        placeholder="ahmad@contoh.com"
         value={email}
         onChangeText={setEmail}
       />
@@ -193,7 +194,7 @@ if (password !== confirmPassword) {
     <Text style={styles.daftar}>Daftar</Text>
   </TouchableOpacity>
     </View>
-    {registerStatus ? <Text>{registerStatus}</Text> : null}
+    {registerStatus ? <Text style={styles.errorText}>{registerStatus}</Text> : null}
 
     <Text style={styles.denganMenekanButangDaftarAndaBersetujuDenganTermaDanSyaratAktivAiSertaMengakuiDasarPrivasiMereka}>
       Dengan menekan butang daftar, anda bersetuju dengan Terma dan syarat Aktiv.ai serta mengakui Dasar Privasi mereka.
@@ -484,6 +485,11 @@ const styles = StyleSheet.create({
     fontStyle: 'normal',
     fontWeight: '800',
     lineHeight: 20,
+  },
+   errorText: {
+    color: 'red',
+    fontSize: 14,
+    marginTop: 8,
   },
 });
 

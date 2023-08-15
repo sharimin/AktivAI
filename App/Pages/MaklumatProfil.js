@@ -307,7 +307,7 @@ setRegisterStatus('Bio mesti kurang daripada 120 patah perkataan.');
       selected={dob}
       onChange={(date) => setDob(date)}
       dateFormat="MM/dd/yyyy"
-      placeholderText=""
+      placeholderText="MM/dd/yyyy"
       showYearDropdown
       scrollableYearDropdown
       yearDropdownItemNumber={100}

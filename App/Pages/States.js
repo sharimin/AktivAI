@@ -1,6 +1,6 @@
 // States.js
 export const listOfStates = [
-    'Penang',
+    'Pulau Pinang',
     'Selangor',
     'Johor',
     'Kedah',

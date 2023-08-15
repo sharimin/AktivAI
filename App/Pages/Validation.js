@@ -10,7 +10,7 @@ export function isValidDateOfBirth(dob) {
 }
 
 export function isValidPassword(password) {
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{8,}$/;
   const isStrongPassword = passwordRegex.test(password);
 
   const requirements = {
@@ -18,7 +18,7 @@ export function isValidPassword(password) {
     uppercase: /[A-Z]/.test(password),
     lowercase: /[a-z]/.test(password),
     number: /\d/.test(password),
-    specialCharacter: /[@$!%*?&]/.test(password),
+    specialCharacter: /[@$!%*?&_]/.test(password),
   };
 
   return { isValid: isStrongPassword, requirements };

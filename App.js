@@ -72,10 +72,11 @@ export default function App() {
         ) : (
           <NavigationContainer>
             <Stack.Navigator>
-            <Stack.Screen name="Profile" component={Profile} />
+            
             <Stack.Screen name="Introduction" component={Introduction} options={{ headerShown: false }}/>
             <Stack.Screen name="Login" component={Login} options={{ headerShown: false }}/>
             <Stack.Screen name="Home" component={Home} options={{ headerShown: false }}/>
+            <Stack.Screen name="Profile" component={Profile} />
               <Stack.Screen name="FirstRegister" component={FirstRegister}  />
               <Stack.Screen name="MaklumatProfil" component={MaklumatProfil} />
               <Stack.Screen name="Success" component={Success} />
