@@ -197,7 +197,7 @@ if (password !== confirmPassword) {
     {registerStatus ? <Text style={styles.errorText}>{registerStatus}</Text> : null}
 
     <Text style={styles.denganMenekanButangDaftarAndaBersetujuDenganTermaDanSyaratAktivAiSertaMengakuiDasarPrivasiMereka}>
-      Dengan menekan butang daftar, anda bersetuju dengan Terma dan syarat Aktiv.ai serta mengakui Dasar Privasi mereka.
+        Dengan Log Masuk atau pendaftaran, anda bersetuju dengan Terma Perkhidmatan dan Dasar Privasi kami.
     </Text>
   </View>
   );

@@ -58,7 +58,7 @@ const Login = ({ navigation }) => {
   };
 
   const navigateToHome = () => {
-    navigation.navigate('Home'); // Navigate to the 'Home' screen
+    navigation.navigate('Home', { userEmail: email });
   };
 
   // Function to store the session token locally

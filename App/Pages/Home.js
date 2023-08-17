@@ -11,12 +11,35 @@ import Logout from './Logout';
 import Clock from './Clock';
 import DateComponent from './DateComponent';
 
-const Home = () => {
+const Home = ({ route }) => {
+  const { userEmail } = route.params;
+  const determineGreeting = () => {
+    const currentHour = new Date().getHours();
+    let greeting;
+
+    if (currentHour >= 0 && currentHour < 12) {
+      greeting = 'Selamat Pagi';
+    } else if (currentHour >= 12 && currentHour < 18) {
+      greeting = 'Selamat Petang';
+    } else {
+      greeting = 'Selamat Malam';
+    }
+
+    return greeting;
+  };
+
+  const greeting = determineGreeting();
+
   const navigation = useNavigation(); // Moved navigation hook to this component
 
   const navigateToProfile = () => {
-    navigation.navigate('Profile');
+    if (userData && userData.email) {
+      navigation.navigate('Profile', { userEmail: userData.email });
+    } else {
+      console.warn("userData is not available");
+    }
   };
+  
   const navigateToAgenda = () => {
     navigation.navigate('Agenda');
   };
@@ -32,7 +55,9 @@ const Home = () => {
     <View style={styles.container}>
       <View style={styles.contentContainer}>
        {/* <WelcomeHeader /> */}
-
+       <Text style={styles.greeting}>HAI, {userEmail}</Text>
+       <Text style={styles.greeting}>{greeting}</Text>
+       
         {/* Button Group: Agenda, Achievement, Profile */}
         <View style={styles.buttonGroupContainer}>
           {/* Button: Agenda */}
@@ -52,7 +77,7 @@ const Home = () => {
           </TouchableOpacity>
 
           {/* Button: Profile */}
-          <TouchableOpacity style={styles.buttonWrapper} onPress={() => navigateToProfile()}>
+          <TouchableOpacity style={styles.buttonWrapper} onPress={navigateToProfile}>
             <View style={styles.roundedButton}>
               <Text style={styles.buttonLabel}>Profile</Text>
             </View>
