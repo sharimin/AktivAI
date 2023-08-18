@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import axios from 'axios';
 import DefaultProfilePicture from '../Assets/Image/aktivAI.png';
-import { useRoute } from '@react-navigation/native';
+import { useRoute,useNavigation } from '@react-navigation/native';
 import Clock from './Clock';
 import DateComponent from './DateComponent';
-const Profile = ({ navigation }) => {
+
+const Profile = ({ route }) => {
+  
+  const navigation = useNavigation();
 
   const determineGreeting = () => {
     const currentHour = new Date().getHours();
@@ -24,7 +27,7 @@ const Profile = ({ navigation }) => {
 
   const greeting = determineGreeting();
 
-  const route = useRoute(); // Add this line at the beginning of the component
+  //const route = useRoute(); // Add this line at the beginning of the component
   
   const navigateToHome = () => {
     navigation.navigate('Home'); // Navigate to the 'Home' screen
@@ -33,11 +36,14 @@ const Profile = ({ navigation }) => {
     navigation.navigate('HtmlScanner'); // Navigate to the 'Home' screen
   };
   const [userData, setUserData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [showClockAndDate, setShowClockAndDate] = useState(false); // New state
 
   useEffect(() => {
-    if (route.params && route.params.userEmail) {
-      const userEmail = route.params.userEmail || '';  
+    const userEmail = route.params ? route.params.userEmail : '';
+    console.log('Profile useEffect triggered. userEmail:', userEmail); // Add this line
+    if (userEmail) {
+      console.log('Profile API call userEmail:', userEmail);
   
       axios
         .get('https://aktivai.web.app/GetUserProfile', {
@@ -46,9 +52,8 @@ const Profile = ({ navigation }) => {
           },
         })
         .then((response) => {
-          console.log('API response:', response.data);
+          console.log('Profile API response:', response.data); // Add this line
   
-          // Check if the response has the expected structure
           if (response.data.success && response.data.data) {
             setUserData(response.data.data);
           } else {
@@ -57,18 +62,24 @@ const Profile = ({ navigation }) => {
         })
         .catch((error) => {
           console.error('Error retrieving user data:', error);
+        })
+        .finally(() => {
+          setIsLoading(false);
         });
     }
   }, [route.params]);
+  
 
-  console.log('userData:', userData);
+  console.log('Profile userData:', userData);
   const toggleClockAndDate = () => {
     setShowClockAndDate(prevState => !prevState);
   };
 
   return (
     <View style={styles.container}>
-      {userData ? (
+      {isLoading ? ( // Display loading state
+        <Text style={styles.messageText}>Loading...</Text>
+      ) : userData ? (
         <>
           <View style={styles.profilePictureContainer}>
             <Image
@@ -83,7 +94,7 @@ const Profile = ({ navigation }) => {
           <Text style={styles.bio}>{userData.bio}</Text>
         </>
       ) : (
-        <Text style={styles.messageText}>Loading...</Text>
+        <Text style={styles.messageText}>No user data available.</Text>
       )}
       {showClockAndDate && (
         <>

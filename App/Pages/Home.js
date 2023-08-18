@@ -1,18 +1,20 @@
-import React, { useContext } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native-web';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import axios from 'axios'; // Don't forget to import axios
 import Colors from '../Shared/Colors';
-import { AuthContext } from '../Context/AuthContext';
 import WelcomeHeader from '../Components/WelcomeHeader';
-import Slider from '../Components/Slider';
-import SearchBar from '../Components/SearchBar';
-import Scanner from '../Components/Scanner';
-import Logout from './Logout';
 import Clock from './Clock';
 import DateComponent from './DateComponent';
+import Logout from './Logout';
 
-const Home = ({ route }) => {
-  const { userEmail } = route.params;
+const Home = () => {
+  const [userData, setUserData] = useState(null);
+  const [userFirstName, setUserFirstName] = useState('');
+  const route = useRoute();
+  const navigation = useNavigation();
+  const userEmail = route.params ? route.params.userEmail : '';
+
   const determineGreeting = () => {
     const currentHour = new Date().getHours();
     let greeting;
@@ -30,45 +32,83 @@ const Home = ({ route }) => {
 
   const greeting = determineGreeting();
 
-  const navigation = useNavigation(); // Moved navigation hook to this component
 
-  const navigateToProfile = () => {
-    if (userData && userData.email) {
-      navigation.navigate('Profile', { userEmail: userData.email });
-    } else {
-      console.warn("userData is not available");
-    }
-  };
   
+
   const navigateToAgenda = () => {
     navigation.navigate('Agenda');
   };
+  
   const navigateToAchievement = () => {
     navigation.navigate('Achievement');
   };
+  
   const navigateToScan = () => {
-    navigation.navigate('HtmlScanner'); // Navigate to the 'Home' screen
+    navigation.navigate('HtmlScanner'); // Navigate to the 'HtmlScanner' screen
   };
-  const { userData, setUserData } = useContext(AuthContext);
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  const handleProfileNavigation = () => {
+    if (userData) {
+      console.log('Home userData:', userData);
+      navigation.navigate('Profile', { userEmail: userData.email });
+    } else {
+      console.warn('Home userData is not available');
+    }
+  };
+  
+  
+  
+  
+  
+  
+  useEffect(() => {
+    if (userEmail) {
+      axios
+        .get('https://aktivai.web.app/GetUserProfile', {
+          params: {
+            email: userEmail,
+          },
+        })
+        .then((response) => {
+          console.log('Home API response:', response.data);
+
+          if (response.data.success && response.data.data) {
+            setUserData(response.data.data);
+            setUserFirstName(response.data.data.first_name);
+          } else {
+            console.warn('API response does not have the expected structure');
+          }
+        })
+        .catch((error) => {
+          console.error('Error retrieving user data:', error);
+        });
+    }
+  }, [userEmail]);
+
+  /* useEffect(() => {
+    if (userData) {
+      handleProfileNavigation(); // Call the function here when userData is updated
+    }
+  }, [userData]); */
+  
 
   return (
     <View style={styles.container}>
       <View style={styles.contentContainer}>
-       {/* <WelcomeHeader /> */}
-       <Text style={styles.greeting}>HAI, {userEmail}</Text>
-       <Text style={styles.greeting}>{greeting}</Text>
-       
-        {/* Button Group: Agenda, Achievement, Profile */}
+        {/* <WelcomeHeader /> */}
+        <Text style={styles.greeting}>HAI, {userFirstName}</Text>
+        <Text style={styles.greeting}>{greeting}</Text>
+
         <View style={styles.buttonGroupContainer}>
-          {/* Button: Agenda */}
           <TouchableOpacity style={[styles.buttonWrapper, styles.buttonMargin]} onPress={navigateToAgenda}>
             <View style={styles.roundedButton}>
               <Text style={styles.buttonLabel}>Agenda</Text>
             </View>
             <Text style={styles.buttonText}>Agenda</Text>
           </TouchableOpacity>
-          
-          {/* Button: Achievement */}
+
           <TouchableOpacity style={[styles.buttonWrapper, styles.buttonMargin]} onPress={navigateToAchievement}>
             <View style={styles.roundedButton}>
               <Text style={styles.buttonLabel}>Achievement</Text>
@@ -76,17 +116,17 @@ const Home = ({ route }) => {
             <Text style={styles.buttonText}>Achievement</Text>
           </TouchableOpacity>
 
-          {/* Button: Profile */}
-          <TouchableOpacity style={styles.buttonWrapper} onPress={navigateToProfile}>
+          <TouchableOpacity style={styles.buttonWrapper} onPress={handleProfileNavigation}>
             <View style={styles.roundedButton}>
               <Text style={styles.buttonLabel}>Profile</Text>
             </View>
             <Text style={styles.buttonText}>Profile</Text>
           </TouchableOpacity>
+
         </View>
 
-        <Clock/>
-        <DateComponent/>
+        <Clock />
+        <DateComponent />
         <TouchableOpacity style={styles.scanButtonContainer} onPress={navigateToScan}>
           <Image
             source={require('../Assets/Image/daftar_scan.png')}
@@ -103,15 +143,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    justifyContent: 'center', // Center vertically
-    alignItems: 'center', // Center horizontally
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   contentContainer: {
     flex: 1,
-    alignItems: 'center', // Center horizontally
+    alignItems: 'center',
   },
   scanButtonContainer: {
-    marginTop: 20, // Add margin
+    marginTop: 20,
     width: 150,
     height: 150,
     borderRadius: 75,
@@ -120,14 +160,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: 'transparent',
   },
-  logoutButtonContainer: {
-    marginTop: 20,
-    padding: 10,
-    backgroundColor: Colors.primary,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   buttonImage: {
     width: '100%',
     height: '100%',
@@ -135,7 +167,7 @@ const styles = StyleSheet.create({
   roundedButton: {
     width: 50,
     height: 50,
-    borderRadius: 50,
+    borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
@@ -144,23 +176,23 @@ const styles = StyleSheet.create({
   buttonText: {
     color: Colors.black,
     fontSize: 12,
-    fontWeight: 'light',
+    fontWeight: 'normal',
   },
   buttonGroupContainer: {
-    flexDirection: 'row', // Stack buttons horizontally
-    alignItems: 'center', // Center horizontally
-    justifyContent: 'space-between', // Space evenly
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginTop: 20,
   },
   buttonWrapper: {
-    alignItems: 'center', // Center horizontally
+    alignItems: 'center',
   },
   buttonLabel: {
     fontSize: 12,
-    fontWeight: 'light',
+    fontWeight: 'normal',
   },
   buttonMargin: {
-    marginHorizontal: 15, // Add horizontal margin between buttons
+    marginHorizontal: 15,
   },
   backButton: {
     backgroundColor: 'blue',
