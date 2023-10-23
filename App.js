@@ -1,10 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import Login from './App/Pages/Login';
-import { AuthContext } from './App/Context/AuthContext';
+
 import { useEffect, useState } from 'react';
 import Home from './App/Pages/Home';
-import Services from './App/Shared/Services';
+import Services from './App/Shared/Services'; 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeNavigation from './App/Navigations/HomeNavigations';
@@ -20,6 +20,9 @@ import Scanner from './App/Components/Scanner';
 import Achievement from './App/Pages/Achievement';
 import Agenda from './App/Pages/Agenda';
 import HtmlScanner from './App/Components/HtmlScanner';
+
+import { UserContext } from './App/Context/UserContext';
+
 
 function isMobileDevice() {
   const maxMobileWidth = 767; // maximum screen width for mobile devices
@@ -64,7 +67,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <AuthContext.Provider value={{ userData, setUserData, handleLogout }}>
+      <UserContext.Provider value={{ userData, setUserData, handleLogout }}>
         {userData ? (
           <NavigationContainer>
             <HomeNavigation />
@@ -81,7 +84,7 @@ export default function App() {
             {props => <Profile {...props} />} 
             </Stack.Screen>  */} 
              <Stack.Screen name="Home" component={Home} options={{ headerShown: true }}/> 
-              <Stack.Screen name="FirstRegister" component={FirstRegister}  />
+              <Stack.Screen name="FirstRegister" component={FirstRegister} options={{ headerShown: false }} />
               <Stack.Screen name="MaklumatProfil" component={MaklumatProfil} />
               <Stack.Screen name="Success" component={Success} />
               <Stack.Screen name="HtmlScanner" component={HtmlScanner} />
@@ -91,19 +94,9 @@ export default function App() {
             </Stack.Navigator>
           </NavigationContainer>
           
-          /*
-          <NavigationContainer>
-              <Stack.Navigator>
-                <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
-                
-              </Stack.Navigator>
-          </NavigationContainer>
-          */
-         //<Register />
+        
         )}
-      </AuthContext.Provider>
-      {/* <Register />
-      <LoginOp /> */}
+      </UserContext.Provider>
     </View>
   );
 }

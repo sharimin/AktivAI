@@ -41,8 +41,6 @@ const handleFirstRegister = () => {
     return;
   }
 
-
-
   if (password !== confirmPassword) {
     setRegisterStatus('Kata laluan tidak sama');
     return;
@@ -108,8 +106,6 @@ if (password !== confirmPassword) {
   });
 
 };
-
-
 
   return (
     <View style={styles.root}>
@@ -195,7 +191,7 @@ if (password !== confirmPassword) {
   </TouchableOpacity>
     </View>
     {registerStatus ? <Text style={styles.errorText}>{registerStatus}</Text> : null}
-
+    
     <Text style={styles.denganMenekanButangDaftarAndaBersetujuDenganTermaDanSyaratAktivAiSertaMengakuiDasarPrivasiMereka}>
         Dengan Log Masuk atau pendaftaran, anda bersetuju dengan Terma Perkhidmatan dan Dasar Privasi kami.
     </Text>
@@ -228,7 +224,7 @@ const styles = StyleSheet.create({
   },
 
   root: {
-    width: 375,
+    width: '100%',
     paddingTop: 0,
     paddingBottom: 56,
     flexDirection: 'column',

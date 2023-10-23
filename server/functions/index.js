@@ -10,6 +10,7 @@ const app = express();
 
 const jwt = require('jsonwebtoken');
 const secret = 'your_jwt_secret';
+const { v4: uuidv4 } = require('uuid');
 
 app.use(cors());
 app.use(express.json());
@@ -104,6 +105,68 @@ app.post('/UpdateProfile', (req, res) => {
   });
 });
 
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
+
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send({ success: false, message: "An error occurred while logging in. Please try again later." });
+    } else {
+      // Check if the email exists in the database
+      connection.query(
+        "SELECT `user_id`, `email`, `password` FROM `User` WHERE `email` = ?",
+        [email],
+        async (err, result) => {
+          if (err) {
+            console.log(err);
+            connection.release();
+            res.status(500).send({ success: false, message: "An error occurred while logging in. Please try again later." });
+          } else {
+            // Check if the email was found in the database
+            if (result.length === 0) {
+              connection.release();
+              res.send({ success: false, message: "Email not found. Please check your credentials." });
+            } else {
+              const storedPasswordHash = result[0].password;
+              try {
+                // Compare the provided password with the stored password hash
+                const passwordMatch = await bcrypt.compare(password, storedPasswordHash);
+                connection.release();
+                if (passwordMatch) {
+                  // Passwords match, login successful
+                  // Generate a JWT and send it back to the app
+                  const token = jwt.sign({ email: email }, secret);
+                  res.send({ success: true, message: "Login successful!", sessionToken: token });
+                } else {
+                  // Passwords don't match, login failed
+                  res.send({ success: false, message: "Invalid password. Please check your credentials." });
+                }
+              } catch (compareError) {
+                // Error occurred during password comparison
+                console.log(compareError);
+                res.status(500).send({ success: false, message: "An error occurred while logging in. Please try again later." });
+              }
+            }
+          }
+        }
+      );
+    }
+  });
+});
+
+app.get('/validateSessionToken', (req, res) => {
+  const sessionToken = req.query.sessionToken;
+
+  try {
+    // Verify the session token using the same secret used to sign it
+    jwt.verify(sessionToken, secret);
+    res.send({ success: true });
+  } catch (error) {
+    // Session token is invalid
+    res.send({ success: false });
+  }
+});
 
 app.post('/sendVerificationCode', (req, res) => {
   const { email } = req.body;
@@ -187,55 +250,6 @@ app.post('/verify', (req, res) => {
   });
 });
 
-app.post('/login', (req, res) => {
-  const { email, password } = req.body;
-
-  pool.getConnection((err, connection) => {
-    if (err) {
-      console.log(err);
-      res.status(500).send({ success: false, message: "An error occurred while logging in. Please try again later." });
-    } else {
-      // Check if the email exists in the database
-      connection.query(
-        "SELECT `user_id`, `email`, `password` FROM `User` WHERE `email` = ?",
-        [email],
-        async (err, result) => {
-          if (err) {
-            console.log(err);
-            connection.release();
-            res.status(500).send({ success: false, message: "An error occurred while logging in. Please try again later." });
-          } else {
-            // Check if the email was found in the database
-            if (result.length === 0) {
-              connection.release();
-              res.send({ success: false, message: "Email not found. Please check your credentials." });
-            } else {
-              const storedPasswordHash = result[0].password;
-              try {
-                // Compare the provided password with the stored password hash
-                const passwordMatch = await bcrypt.compare(password, storedPasswordHash);
-                connection.release();
-                if (passwordMatch) {
-                  // Passwords match, login successful
-                  // Generate a JWT and send it back to the app
-                  const token = jwt.sign({ email: email }, secret);
-                  res.send({ success: true, message: "Login successful!", sessionToken: token });
-                } else {
-                  // Passwords don't match, login failed
-                  res.send({ success: false, message: "Invalid password. Please check your credentials." });
-                }
-              } catch (compareError) {
-                // Error occurred during password comparison
-                console.log(compareError);
-                res.status(500).send({ success: false, message: "An error occurred while logging in. Please try again later." });
-              }
-            }
-          }
-        }
-      );
-    }
-  });
-});
 
 
 app.get('/GetUserProfile', (req, res) => {
@@ -247,7 +261,7 @@ app.get('/GetUserProfile', (req, res) => {
       res.status(500).send({ success: false, message: "An error occurred while fetching user profile data." });
     } else {
       connection.query(
-        "SELECT first_name, last_name, profile_picture, bio, profession, city, states FROM User WHERE email = ?",
+        "SELECT * FROM User WHERE email = ?",
         [email],
         (err, result) => {
           connection.release();
@@ -267,4 +281,150 @@ app.get('/GetUserProfile', (req, res) => {
     }
   });
 });
+ 
+app.post('/createEvent', (req, res) => {
+  const { event_name, event_start_date, event_end_date, event_location } = req.body;
+
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.log(err);
+      res.send({ success: false, message: "An error occurred while creating the event. Please try again later." });
+    } else {
+      connection.query(
+        "INSERT INTO `Event` (`event_name`, `event_start_date`, `event_end_date`, `event_location`) VALUES (?, ?, ?, ?)",
+        [event_name, event_start_date, event_end_date, event_location],
+        (err, result) => {
+          if (err) {
+            connection.release();
+            console.log(err);
+            res.send({ success: false, message: "An error occurred while creating the event. Please try again later." });
+          } else {
+            // Get the ID of the newly inserted event
+            const event_id = result.insertId;
+
+            // Generate a unique QR code string for the event that includes the event_id
+            const qr_code_string = `${event_id}:${uuidv4()}`;
+
+            // Update the qr_code_string field in the Event table
+            connection.query(
+              "UPDATE `Event` SET `qr_code_string` = ? WHERE `event_id` = ?",
+              [qr_code_string, event_id],
+              (err, result) => {
+                connection.release();
+
+                if (err) {
+                  console.log(err);
+                  res.send({ success: false, message: "An error occurred while creating the event. Please try again later." });
+                } else {
+                  res.send({ success: true, message: "Event created successfully!", qr_code_string });
+                }
+              }
+            );
+          }
+        }
+      );
+    }
+  });
+});
+
+app.post('/attendEvent', (req, res) => {
+  const { user_id, event_id, scanned_qr_code_string, attendance_date } = req.body;
+  res.setHeader('Content-Type', 'application/json');
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.log(err);
+      res.json({ success: false, message: "An error occurred while recording your attendance. Please try again later." });
+    } else {
+      // Check if the scanned QR code string matches the one stored in the database for the specified event
+      connection.query(
+        "SELECT `qr_code_string` FROM `Event` WHERE `event_id` = ?",
+        [event_id],
+        (err, result) => {
+          if (err) {
+            console.log(err);
+            res.json({ success: false, message: "An error occurred while recording your attendance. Please try again later." });
+          } else if (result.length === 0) {
+            res.json({ success: false, message: "The specified event does not exist." });
+          } else if (result[0].qr_code_string !== scanned_qr_code_string) {
+            res.json({ success: false, message: "The scanned QR code does not match the one for the specified event." });
+          } else {
+            // The scanned QR code string matches the one stored in the database for the specified event
+            connection.query(
+              "INSERT INTO `Attendance` (`user_id`, `event_id`, `attendance_date`) VALUES (?, ?, ?)",
+              [user_id, event_id, attendance_date],
+              (err, result) => {
+                connection.release();
+
+                if (err) {
+                  console.log(err);
+                  res.json({ success: false, message: "An error occurred while recording your attendance. Please try again later." });
+                } else {
+                  res.json({ success: true, message: "Attendance recorded successfully!" });
+                }
+              }
+            );
+          }
+        }
+      );
+    }
+  });
+});
+
+
+app.get('/getAttendance', (req, res) => {
+  const { user_id, event_id } = req.query;
+
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.log(err);
+      res.send({ success: false, message: "An error occurred while retrieving your attendance records. Please try again later." });
+    } else {
+      // Get the start and end dates of the specified event
+      connection.query(
+        "SELECT `event_start_date`, `event_end_date` FROM `Event` WHERE `event_id` = ?",
+        [event_id],
+        (err, result) => {
+          if (err) {
+            console.log(err);
+            res.send({ success: false, message: "An error occurred while retrieving your attendance records. Please try again later." });
+          } else if (result.length === 0) {
+            res.send({ success: false, message: "The specified event does not exist." });
+          } else {
+            const { event_start_date, event_end_date } = result[0];
+
+            // Get the user's attendance records for the specified event
+            connection.query(
+              "SELECT `attendance_date` FROM `Attendance` WHERE `user_id` = ? AND `event_id` = ?",
+              [user_id, event_id],
+              (err, result) => {
+                connection.release();
+
+                if (err) {
+                  console.log(err);
+                  res.send({ success: false, message: "An error occurred while retrieving your attendance records. Please try again later." });
+                } else {
+                  const attendance_dates = result.map(row => row.attendance_date);
+
+                  // Check if the user has attended all days of the event
+                  let current_date = new Date(event_start_date);
+                  let completed_attendance = true;
+                  while (current_date <= new Date(event_end_date)) {
+                    if (!attendance_dates.includes(current_date.toISOString().slice(0, 10))) {
+                      completed_attendance = false;
+                      break;
+                    }
+                    current_date.setDate(current_date.getDate() + 1);
+                  }
+
+                  res.send({ success: true, completed_attendance });
+                }
+              }
+            );
+          }
+        }
+      );
+    }
+  });
+});
+
 exports.app = functions.https.onRequest(app);

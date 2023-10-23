@@ -5,11 +5,8 @@ import Colors from '../Shared/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
-import { AuthContext } from '../Context/AuthContext';
 import Services from '../Shared/Services';
-import MaklumatProfil from './MaklumatProfil';
 import axios from 'axios';
-import { isValidEmail, isValidDateOfBirth, isValidPassword } from './Validation';
 import { useNavigation } from '@react-navigation/native';
 import Vector from '../Assets/vectors/Vector.svg';
 import Vector2 from '../Assets/vectors/Vector2.svg';
@@ -19,18 +16,17 @@ import Lock from '../Assets/vectors/Lock.svg';
 import VuesaxLinearEyeSlash from '../Assets/vectors/VuesaxLinearEyeSlash.svg';
 import CommpanyIcon from '../Assets/vectors/CommpanyIcon.svg';
 import theme from '../theme.ts';
+import { UserContext } from '../Context/UserContext';
+
  
 const Login = ({ navigation }) => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loginStatus, setLoginStatus] = useState('');
-  const [registerMode, setRegisterMode] = useState(false);
   const [registerStatus, setRegisterStatus] = useState('');
   WebBrowser.maybeCompleteAuthSession();
-  const [accessToken, setAccessToken] = useState();
-  const [userInfo, setUserInfo] = useState();
-  const { userData, setUserData } = useContext(AuthContext);
+  const { userData, setUserData } = useContext(UserContext);
+
   const [request, response, promptAsync] = Google.useAuthRequest({
     webClientId: '589953723916-gb6t3l6f3q2ga5vvl940unndjvqglevq.apps.googleusercontent.com',
     expoClientId: '589953723916-gb6t3l6f3q2ga5vvl940unndjvqglevq.apps.googleusercontent.com'
@@ -61,121 +57,149 @@ const Login = ({ navigation }) => {
     navigation.navigate('Home', { userEmail: email });
   };
 
-  // Function to store the session token locally
-const storeToken = async (token) => {
-  try {
-    await AsyncStorage.setItem('sessionToken', token);
-  } catch (error) {
-    // Handle error
-  }
+// Function to store the session token in a cookie
+const setSessionTokenCookie = (token) => {
+  document.cookie = `sessionToken=${token}; path=/`;
 }
 
-// Function to get the session token from local storage
-const getToken = async () => {
-  try {
-    const token = await AsyncStorage.getItem('sessionToken');
-    return token;
-  } catch (error) {
-    // Handle error
-  }
-}
-
-// Function to store the user data locally
-const storeUserData = async (userData) => {
-  try {
-    await AsyncStorage.setItem('userData', JSON.stringify(userData));
-  } catch (error) {
-    // Handle error
-  }
-}
-
-// Function to get the user data from local storage
-const getUserDataFromEmail = async () => {
-  try {
-    const userData = await AsyncStorage.getItem('userData');
-    return JSON.parse(userData);
-  } catch (error) {
-    // Handle error
-  }
-}
-
-// Function to get the user data from the server using the session token
-const getUserDataFromServer = async (sessionToken) => {
-  try {
-    // Make API call to get the user data using the session token
-    const response = await fetch('https://aktivai.web.app/login', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${sessionToken}`
-      }
-    });
-    const userData = await response.json();
-    return userData;
-  } catch (error) {
-    // Handle error
-  }
-}
-
-  const handleLogin = async () => {
-    if (!email || !password) {
-      setRegisterStatus('Please fill in all fields');
-      return;
+// Function to get the session token from the cookie
+const getSessionTokenCookie = () => {
+  const cookies = document.cookie.split('; ');
+  for (const cookie of cookies) {
+    const [name, value] = cookie.split('=');
+    if (name === 'sessionToken') {
+      return value;
     }
-  
-    // Add form empty email
-    if (!email) {
-      setRegisterStatus('Username cannot be empty');
-      return;
+  }
+  return null;
+}
+
+// Function to store the email in a cookie
+const setEmailCookie = (email) => {
+  document.cookie = `email=${email}; path=/`;
+}
+
+// Function to get the email from the cookie
+const getEmailCookie = () => {
+  const cookies = document.cookie.split('; ');
+  for (const cookie of cookies) {
+    const [name, value] = cookie.split('=');
+    if (name === 'email') {
+      return value;
     }
-    // Add form empty password
-    if (!password) {
-      setRegisterStatus('Password cannot be empty');
-      return;
-    }
-  
-      // Add axios registration request here
-      axios
-      .post('https://aktivai.web.app/login', {
+  }
+  return null;
+}
+
+// Function to check if the session token is valid
+const isSessionTokenValid = async (sessionToken) => {
+  try {
+    const response = await fetch(`https://aktivai.web.app/validateSessionToken?sessionToken=${sessionToken}`);
+    const data = await response.json();
+    return data.success;
+  } catch (error) {
+    // Handle error
+    return false;
+  }
+}
+
+
+// Check if the session token and email exist and are valid when the app is loaded
+(async () => {
+  const sessionToken = getSessionTokenCookie();
+  const email = getEmailCookie();
+  if (sessionToken && email && await isSessionTokenValid(sessionToken)) {
+    // Get the user profile data and populate the properties of the userData object
+    await getUserProfile(email);
+    //console.log('Home userData:', userInfoData.);
+    navigateToHome();
+    // Session token and email exist and are valid, automatically log the user in
+    // ...
+  }
+})();
+
+async function getUserProfile(email) {
+  try {
+    // Get the user profile data from the server
+    const userProfileResponse = await axios.get('https://aktivai.web.app/GetUserProfile', {
+      params: {
         email: email,
-        password: password,
-      })
-      .then((response) => {
-        if (response.data.success) {
-    // Login was successful
-    setRegisterStatus('Login successful!'); // You can customize the success message
-    //const sessionToken = data.sessionToken;
+      },
+    });
 
-    // Store the session token locally
-   // await storeToken(sessionToken);
+    if (userProfileResponse.data.success && userProfileResponse.data.data) {
+      const userProfileData = userProfileResponse.data.data;
 
-    // Get the user data using the session token
-    //const userData = await getUserDataFromServer(sessionToken);
+      // Populate the properties of the userData object with the user profile data
+      setUserData(userProfileData);
 
-    // Store the user data locally
-    //await storeUserData(userData);
-
-    // Clear the email and password fields after successful login
-    setEmail('');
-    setPassword('');
-
-    // Navigate to the Home screen or perform other actions
-          navigateToHome();
+      return userData;
     } else {
-          // Login failed
-          setRegisterStatus(response.data.message); // You can customize the error message
-        }
-        })
-        .catch((error) => {
-          // Handle errors here
-          console.error('Error occurred:', error);
-          setRegisterStatus('An error occurred while logging in. Please try again later.');
-        });
-    
-  };
+      throw new Error('API response does not have the expected structure');
+    }
+  } catch (error) {
+    console.error('Error retrieving user data:', error);
+    return null;
+  }
+}
 
+
+
+const handleLogin = async () => {
+  if (!email || !password) {
+    setRegisterStatus('Please fill in all fields');
+    return;
+  }
+
+  // Add form empty email
+  if (!email) {
+    setRegisterStatus('Username cannot be empty');
+    return;
+  }
+  // Add form empty password
+  if (!password) {
+    setRegisterStatus('Password cannot be empty');
+    return;
+  }
+
+  axios
+    .post('https://aktivai.web.app/login', {
+      email: email,
+      password: password,
+    })
+    .then(async (response) => {
+      if (response.data.success) {
+        // Login was successful
+        setRegisterStatus('Login successful!'); // You can customize the success message
+
+        // Store the session token in a cookie
+        setSessionTokenCookie(response.data.sessionToken);
+        setEmailCookie(email);
+
+        // Clear the email and password fields after successful login
+        setEmail('');
+        setPassword('');
+
+        // Get the user profile data and populate the properties of the userData object
+        await getUserProfile(email);
+
+        // Navigate to the Home screen or perform other actions
+        navigateToHome();
+      } else {
+        // Login failed
+        setRegisterStatus(response.data.message); // You can customize the error message
+      }
+    })
+    .catch((error) => {
+      // Handle errors here
+      console.error('Error occurred:', error);
+      setRegisterStatus('An error occurred while logging in. Please try again later.');
+    });
+};
   return (
-    <View style={styles.root}>
+
+
+ <View style={styles.root}>
     <View style={styles.frame162509}>
       <View style={styles.group513845}>
         {/* <Vector />
@@ -251,6 +275,8 @@ const getUserDataFromServer = async (sessionToken) => {
   </TouchableOpacity>
   </View>
   </View>
+
+    
   );
 }
 const emailInputStyle = {
@@ -275,7 +301,7 @@ const styles = StyleSheet.create({
   },
 
   root: {
-    width: 375,
+    width: '100%',
     paddingTop: 0,
     paddingBottom: 56,
     flexDirection: 'column',
