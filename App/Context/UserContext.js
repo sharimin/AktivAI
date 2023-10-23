@@ -1,17 +1,20 @@
 import React, { createContext, useState } from 'react';
 
+
+
 // Create a new context called AuthContext
-export const AuthContext = createContext();
+export const UserContext = createContext(null);
 
 // Define the AuthProvider component
-export const AuthProvider = ({ children }) => {
+export const UserProvider = ({ children }) => {
   // Define the initial value for the userData state
   const [userData, setUserData] = useState(null);
 
   // Return the AuthContext.Provider component
   return (
-    <AuthContext.Provider value={{ userData, setUserData }}>
+    <UserContext.Provider value={{ userData, setUserData }}>
       {children}
-    </AuthContext.Provider>
+    </UserContext.Provider>
   );
 };
+
