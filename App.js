@@ -18,6 +18,7 @@ import RegisterNavigation from './App/Navigations/RegisterNavigation';
 import Introduction from './App/Pages/Introduction';
 import Scanner from './App/Components/Scanner';
 import Achievement from './App/Pages/Achievement';
+import GameScreen from './App/Pages/GameScreen';
 import Agenda from './App/Pages/Agenda';
 import HtmlScanner from './App/Components/HtmlScanner';
 
@@ -90,6 +91,7 @@ export default function App() {
               <Stack.Screen name="HtmlScanner" component={HtmlScanner} />
               <Stack.Screen name="Scanner" component={Scanner} />
               <Stack.Screen name="Achievement" component={Achievement} />
+              <Stack.Screen name="GameScreen" component={GameScreen} />
               <Stack.Screen name="Agenda" component={Agenda} />
             </Stack.Navigator>
           </NavigationContainer>

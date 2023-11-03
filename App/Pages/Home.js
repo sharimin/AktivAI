@@ -57,12 +57,12 @@
   
             <TouchableOpacity
               style={[styles.buttonWrapper, styles.buttonMargin]}
-              onPress={() => navigateToScreen('Achievement')}
+              onPress={() => navigateToScreen('GameScreen')}
             >
               <View style={styles.roundedButton}>
-                <Text style={styles.buttonLabel}>Achievement</Text>
+                <Text style={styles.buttonLabel}>Aktiv World</Text>
               </View>
-              <Text style={styles.buttonText}>Achievement</Text>
+              <Text style={styles.buttonText}>Aktiv World</Text>
             </TouchableOpacity>
   
             <TouchableOpacity

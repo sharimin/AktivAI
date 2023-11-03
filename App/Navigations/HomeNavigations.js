@@ -3,6 +3,7 @@ import Scanner from '../Components/Scanner';
 import Profile from '../Pages/Profile';
 import Agenda from '../Pages/Agenda';
 import Achievement from '../Pages/Achievement';
+import GameScreen from '../Pages/GameScreen';
 import Logout from '../Pages/Logout';
 import Success from '../Pages/Success';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -20,6 +21,7 @@ export default function HomeNavigation() {
       <Stack.Screen name="Profile" component={Profile} />
       <Stack.Screen name="Agenda" component={Agenda} />
       <Stack.Screen name="Achievement" component={Achievement} />
+      <Stack.Screen name="GameScreen" component={GameScreen} />
 
     </Stack.Navigator>
   );

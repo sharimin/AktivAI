@@ -16,10 +16,10 @@ app.use(cors());
 app.use(express.json());
 
 const pool = mysql.createPool({
-  host: 'srv1042.hstgr.io',
-  user: 'u438552292_aktivai_min',
-  password: 'Resc00p@12345',
-  database: 'u438552292_aktivai',
+  host: '173.82.165.202',
+  user: 'evilmy_admin',
+  password: 'hn#M4T*#fiiP',
+  database: 'evilmy_aktiv_backend',
 });
 
 const transporter = nodemailer.createTransport({
@@ -29,6 +29,17 @@ const transporter = nodemailer.createTransport({
     pass: 'your_password'
   }
 });
+
+pool.getConnection((err) => {
+  if (err) {
+    console.log('Connection error:', err);
+  } else {
+    console.log('Successfully connected to the database.');
+    // You can now use 'connection' to query your database
+  }
+});
+
+
 
 app.post('/register', async (req, res) => {
   const { email, password } = req.body;
