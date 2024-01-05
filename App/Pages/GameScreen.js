@@ -9,40 +9,28 @@ const GameScreen= () => {
   const navigation = useNavigation();
 
   const runFirst = `
-  window.UnityInstance = UnityLoader.instantiate("unityContainer", "https://aktiv.ai/Scan/Webgl/index.html, {
-    onProgress: function (progress) {
-      if (progress === 1) {
-        try {
-          window.UnityInstance.SendMessage("WebLogin", "UpdateUserData", JSON.stringify(${JSON.stringify(userData)}));
-        } catch (error) {
-          console.error('Error sending user data to Unity:', error);
+    window.ReactNativeWebView.postMessage('${userData.token}');
+  `;
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Text style={styles.backButton}>Back</Text>
+        </TouchableOpacity>
+        <Text style={styles.title}>Aktiv World</Text>
+        {
+          Platform.OS === 'web' ?
+          <iframe src="https://aktiv.ai/Scan/Webgl/index.html" style={{ flex: 1, width: '100%', height: '720px' }} /> :
+          <WebView
+            source={{ html: '<div id="unityContainer" style="width: 100%; height: 100%;"></div>' }}
+            injectedJavaScript={runFirst}
+            style={{ flex: 1 }}
+          />
         }
-      }
-    }
-  });
-
-  true;
-`;
-
-return (
-  <View style={styles.container}>
-    <View style={styles.header}>
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text style={styles.backButton}>Back</Text>
-      </TouchableOpacity>
-      <Text style={styles.title}>Aktiv World</Text>
-      {
-        Platform.OS === 'web' ?
-        <iframe src="https://aktiv.ai/Scan/Webgl/index.html" style={{ flex: 1, width: '100%', height: '720px' }} /> :
-        <WebView
-          source={{ html: '<div id="unityContainer" style="width: 100%; height: 100%;"></div>' }}
-          // injectedJavaScript={runFirst}
-          style={{ flex: 1 }}
-        />
-      }
+      </View>
     </View>
-  </View>
-);
+  );
 }
 
 const styles = StyleSheet.create({

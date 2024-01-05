@@ -1,441 +1,282 @@
+require('dotenv').config();
 const functions = require('firebase-functions');
 const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
-const saltRounds = 10;
+const jwt = require('jsonwebtoken');
+const { body, validationResult } = require('express-validator');
+const jwtDecode = require('jwt-decode');
+const winston = require('winston');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 const app = express();
-
-const jwt = require('jsonwebtoken');
-const secret = 'your_jwt_secret';
-const { v4: uuidv4 } = require('uuid');
-
 app.use(cors());
 app.use(express.json());
+app.use(helmet());
+
+
+//app.set('trust proxy', true);
+app.set('trust proxy', 1);
+
+//app.set('trust proxy', ['loopback', '192.0.2.0/24', '2001:db8::/32']);
+
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  defaultMeta: { service: 'user-service' },
+  transports: [
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'combined.log' })
+  ],
+});
+
+if (process.env.NODE_ENV !== 'production') {
+  logger.add(new winston.transports.Console({
+    format: winston.format.simple(),
+  }));
+}
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 login requests per windowMs
+  message: 'Too many login attempts from this IP, please try again after 15 minutes'
+});
+
+const saltRounds = 10;
+const secret = process.env.JWT_SECRET;
+const { v4: uuidv4 } = require('uuid');
 
 const pool = mysql.createPool({
-  host: '173.82.165.202',
-  user: 'evilmy_admin',
-  password: 'hn#M4T*#fiiP',
-  database: 'evilmy_aktiv_backend',
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'your_email@gmail.com',
-    pass: 'your_password'
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD
   }
 });
 
-pool.getConnection((err) => {
-  if (err) {
-    console.log('Connection error:', err);
-  } else {
-    console.log('Successfully connected to the database.');
-    // You can now use 'connection' to query your database
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (token == null) return res.sendStatus(401);
+
+  jwt.verify(token, secret, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+};
+
+
+// Register Route
+app.post('/register', [
+  body('email')
+    .isEmail()
+    .withMessage('Please enter a valid email address.'),
+  body('password')
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters long.')
+], async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const extractedErrors = [];
+    errors.array().map(err => extractedErrors.push({ [err.param]: err.msg }));
+
+    return res.status(400).json({
+      success: false,
+      message: "Validation errors occurred.",
+      errors: extractedErrors
+    });
   }
-});
 
-
-
-app.post('/register', async (req, res) => {
   const { email, password } = req.body;
-  const user_id = email;
-
   try {
-    // Hash the password using bcrypt
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-
     pool.getConnection((err, connection) => {
-      if (err) {
-        console.log(err);
-        res.send({ success: false, message: "An error occurred while registering. Please try again later." });
-      } else {
-        // Use the connection to perform the query
-        connection.query(
-          "INSERT INTO `User` (`user_id`, `email`, `password`) VALUES (?, ?, ?)",
-          [user_id, email, hashedPassword], // Store the hashed password in the database
-          (err, result) => {
-            connection.release();
+      if (err) return next(err);
 
-            if (err) {
-              if (err.code === 'ER_DUP_ENTRY') {
-                res.send({ success: false, message: "An account with this email address already exists. Please use a different email address." });
-              } else {
-                console.log(err);
-                res.send({ success: false, message: "An error occurred while registering. Please try again later." });
-              }
-            } else {
-              res.send({ success: true, message: "Account created successfully!" });
-            }
+      connection.query("INSERT INTO `User` (`email`, `password`) VALUES (?, ?)", [email, hashedPassword], (err, result) => {
+        connection.release();
+        if (err) {
+          // Check for duplicate email error
+          if (err.code === 'ER_DUP_ENTRY') {
+            return res.status(409).json({ success: false, message: "An account with this email already exists." });
+          } else {
+            return next(err);
           }
-        );
-      }
+        }
+        res.json({ success: true, message: "Account created successfully!" });
+      });
     });
   } catch (error) {
-    console.log(error);
-    res.send({ success: false, message: "An error occurred while registering. Please try again later." });
+    next(error);
   }
 });
 
-app.post('/UpdateProfile', (req, res) => {
-  const { email, user_id, first_name, last_name, profile_picture, dob, gender, phone_number, bio, profession, city, states } = req.body;
+
+
+// Update Profile Route
+app.post('/UpdateProfile', authenticateToken, (req, res, next) => {
+  const { email, first_name, last_name, profile_picture, dob, gender, phone_number, bio, profession, city, states } = req.body;
 
   pool.getConnection((err, connection) => {
-    if (err) {
-      // Handle error getting a connection from the pool
-      console.log(err);
-      res.send({ success: false, message: "An error occurred while updating your profile. Please try again later." });
-    } else {
-      // Use the connection to perform the query
-      connection.query(
-        "UPDATE `User` SET `user_id` = ?, `first_name` = ?, `last_name` = ?, `profile_picture` = ?, `dob` = ?, `gender` = ?, `phone_number` = ?, `bio` = ?, `profession` = ?, `city` = ?, `states` = ? WHERE `email` = ?",
-        [user_id, first_name, last_name, profile_picture, dob, gender, phone_number, bio, profession, city, states, email],
-        (err, result) => {
-          // Release the connection back to the pool
-          connection.release();
+    if (err) return next(err);
 
-          if (err) {
-            if (err.code === 'ER_DUP_ENTRY') {
-              // Handle duplicate entry error
-              res.send({ success: false, message: "The username is already taken. Please use a different username." });
-            } else {
-              // Handle other errors
-              console.log(err); // Log the error object to see more details
-              res.send({ success: false, message: "An error occurred while updating your profile. Please try again later." });
-            }
-          } else {
-            res.send({ success: true, message: "Profile updated successfully!" });
-          }
-        }
-      );
-    }
+    const query = "UPDATE `User` SET `first_name` = ?, `last_name` = ?, `profile_picture` = ?, `dob` = ?, `gender` = ?, `phone_number` = ?, `bio` = ?, `profession` = ?, `city` = ?, `states` = ? WHERE `email` = ?";
+    connection.query(query, [first_name, last_name, profile_picture, dob, gender, phone_number, bio, profession, city, states, email], (err, result) => {
+      connection.release();
+      if (err) return next(err);
+      res.json({ success: true, message: "Profile updated successfully!" });
+    });
   });
 });
 
-app.post('/login', (req, res) => {
+// Login Route
+// Login Route
+app.post('/login', loginLimiter, async (req, res, next) => {
   const { email, password } = req.body;
 
-  pool.getConnection((err, connection) => {
-    if (err) {
-      console.log(err);
-      res.status(500).send({ success: false, message: "An error occurred while logging in. Please try again later." });
-    } else {
-      // Check if the email exists in the database
-      connection.query(
-        "SELECT `user_id`, `email`, `password` FROM `User` WHERE `email` = ?",
-        [email],
-        async (err, result) => {
-          if (err) {
-            console.log(err);
-            connection.release();
-            res.status(500).send({ success: false, message: "An error occurred while logging in. Please try again later." });
-          } else {
-            // Check if the email was found in the database
-            if (result.length === 0) {
-              connection.release();
-              res.send({ success: false, message: "Email not found. Please check your credentials." });
-            } else {
-              const storedPasswordHash = result[0].password;
-              try {
-                // Compare the provided password with the stored password hash
-                const passwordMatch = await bcrypt.compare(password, storedPasswordHash);
-                connection.release();
-                if (passwordMatch) {
-                  // Passwords match, login successful
-                  // Generate a JWT and send it back to the app
-                  const token = jwt.sign({ email: email }, secret);
-                  res.send({ success: true, message: "Login successful!", sessionToken: token });
-                } else {
-                  // Passwords don't match, login failed
-                  res.send({ success: false, message: "Invalid password. Please check your credentials." });
-                }
-              } catch (compareError) {
-                // Error occurred during password comparison
-                console.log(compareError);
-                res.status(500).send({ success: false, message: "An error occurred while logging in. Please try again later." });
-              }
-            }
-          }
-        }
-      );
-    }
-  });
-});
-
-app.get('/validateSessionToken', (req, res) => {
-  const sessionToken = req.query.sessionToken;
+  // Log the input
+  console.log(`Login attempt with email: ${email}`);
 
   try {
-    // Verify the session token using the same secret used to sign it
-    jwt.verify(sessionToken, secret);
-    res.send({ success: true });
+    pool.getConnection(async (err, connection) => {
+      if (err) {
+        console.error(`Error getting database connection: ${err}`);
+        return next(err);
+      }
+
+      connection.query("SELECT `email`, `password` FROM `User` WHERE `email` = ?", [email], async (err, results) => {
+        connection.release();
+        if (err) {
+          console.error(`Error executing query: ${err}`);
+          return next(err);
+        }
+
+        // Log the intermediate result
+        console.log(`Query result: ${results}`);
+
+        if (results.length === 0) {
+          console.warn(`Invalid email or password for email: ${email}`);
+          return res.status(401).json({ success: false, message: "Invalid email or password." });
+        }
+
+        const user = results[0];
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) {
+          console.warn(`Invalid email or password for email: ${email}`);
+          return res.status(401).json({ success: false, message: "Invalid email or password." });
+        }
+
+        const token = jwt.sign({ email: user.email }, secret, { expiresIn: '24h' });
+        // Log the successful login
+        console.log(`Login successful for email: ${email}`);
+        res.json({ success: true, message: "Login successful!", token });
+      });
+    });
   } catch (error) {
-    // Session token is invalid
-    res.send({ success: false });
+    // Log the exception
+    console.error(`Exception caught: ${error}`);
+    next(error);
   }
 });
 
-app.post('/sendVerificationCode', (req, res) => {
-  const { email } = req.body;
 
-  // Generate a random verification code
+// Get User Profile Route
+app.get('/getUserProfile', authenticateToken, (req, res, next) => {
+  const userEmail = req.user.email;
+
+  pool.getConnection((err, connection) => {
+    if (err) return next(err);
+
+    connection.query("SELECT * FROM User WHERE email = ?", [userEmail], (err, results) => {
+      connection.release();
+      if (err) return next(err);
+
+      if (results.length > 0) {
+        const userData = results[0];
+        res.json({ success: true, user: userData });
+      } else {
+        res.status(404).json({ success: false, message: "User not found." });
+      }
+    });
+  });
+});
+
+// Token Validation Route
+app.get('/validateSessionToken', authenticateToken, (req, res, next) => {
+  const token = req.headers['authorization'].split(' ')[1];
+
+  try {
+    const decodedToken = jwtDecode(token);
+    const expiresIn = decodedToken.exp - Math.floor(Date.now() / 1000);
+    res.json({ success: true, message: "Session token is valid.", expiresIn });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Send Verification Code Route
+app.post('/sendVerificationCode', (req, res, next) => {
+  const { email } = req.body;
   const verificationCode = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
 
-  // Send the verification code to the user's email address
   transporter.sendMail({
-    from: 'your_email@gmail.com',
+    from: process.env.EMAIL_USER,
     to: email,
     subject: 'Your Verification Code',
     text: `Your verification code is: ${verificationCode}`
   }, (err, info) => {
-    if (err) {
-      // Handle error sending the email
-      console.log(err);
-      res.send({ success: false, message: "An error occurred while sending the verification email. Please try again later." });
-    } else {
-      // Store the verification code in the database
-      pool.getConnection((err, connection) => {
-        if (err) {
-          // Handle error getting a connection from the pool
-          console.log(err);
-          res.send({ success: false, message: "An error occurred while sending the verification email. Please try again later." });
-        } else {
-          // Use the connection to perform the query
-          connection.query(
-            "UPDATE `User` SET `verification_code` = ? WHERE `email` = ?",
-            [verificationCode, email],
-            (err, result) => {
-              // Release the connection back to the pool
-              connection.release();
+    if (err) return next(err);
 
-              if (err) {
-                // Handle errors
-                console.log(err); // Log the error object to see more details
-                res.send({ success: false, message: "An error occurred while sending the verification email. Please try again later." });
-              } else {
-                res.send({ success: true, message: "Verification code sent successfully! Please check your email." });
-              }
-            }
-          );
-        }
+    pool.getConnection((err, connection) => {
+      if (err) return next(err);
+
+      connection.query("UPDATE `User` SET `verification_code` = ? WHERE `email` = ?", [verificationCode, email], (err, result) => {
+        connection.release();
+        if (err) return next(err);
+        res.json({ success: true, message: "Verification code sent successfully! Please check your email." });
       });
-    }
+    });
   });
 });
 
-
-
-app.post('/verify', (req, res) => {
+// Email Verification Route
+app.post('/verify', (req, res, next) => {
   const { email, verificationCode } = req.body;
 
   pool.getConnection((err, connection) => {
-    if (err) {
-      // Handle error getting a connection from the pool
-      console.log(err);
-      res.send({ err });
-    } else {
-      // Use the connection to perform the query
-      connection.query(
-        "SELECT * FROM User WHERE email = ? AND verification_code = ?",
-        [email,verificationCode],
-        (err,result) => {
-          // Release the connection back to the pool
-          connection.release();
+    if (err) return next(err);
 
-          if(err){
-            req.setEncoding({ err });
-          } else{
-            if(result.length > 0){
-              res.send({ success: true, message: "Email verified successfully!" });
-            } else{
-              res.send({ success: false, message: "Invalid verification code. Please try again." });
-            }
-          }
-        }
-      );
-    }
+    connection.query("SELECT * FROM User WHERE email = ? AND verification_code = ?", [email, verificationCode], (err, result) => {
+      connection.release();
+      if (err) return next(err);
+
+      if (result.length > 0) {
+        res.json({ success: true, message: "Email verified successfully!" });
+      } else {
+        res.json({ success: false, message: "Invalid verification code. Please try again." });
+      }
+    });
   });
 });
 
 
-
-app.get('/GetUserProfile', (req, res) => {
-  const { email } = req.query; // Assuming you will pass the user's email as a query parameter
-  res.header('cache-control', 'no-store, no-cache, must-revalidate, proxy-revalidate', 'x-content-type-options', 'nosniff');
-  pool.getConnection((err, connection) => {
-    if (err) {
-      console.log(err);
-      res.status(500).send({ success: false, message: "An error occurred while fetching user profile data." });
-    } else {
-      connection.query(
-        "SELECT * FROM User WHERE email = ?",
-        [email],
-        (err, result) => {
-          connection.release();
-          if (err) {
-            console.log(err);
-            res.status(500).send({ success: false, message: "An error occurred while fetching user profile data." });
-          } else {
-            if (result.length > 0) {
-              const userProfileData = result[0];
-              res.send({ success: true, data: userProfileData });
-            } else {
-              res.send({ success: false, message: "User profile data not found." });
-            }
-          }
-        }
-      );
-    }
-  });
-});
- 
-app.post('/createEvent', (req, res) => {
-  const { event_name, event_start_date, event_end_date, event_location } = req.body;
-
-  pool.getConnection((err, connection) => {
-    if (err) {
-      console.log(err);
-      res.send({ success: false, message: "An error occurred while creating the event. Please try again later." });
-    } else {
-      connection.query(
-        "INSERT INTO `Event` (`event_name`, `event_start_date`, `event_end_date`, `event_location`) VALUES (?, ?, ?, ?)",
-        [event_name, event_start_date, event_end_date, event_location],
-        (err, result) => {
-          if (err) {
-            connection.release();
-            console.log(err);
-            res.send({ success: false, message: "An error occurred while creating the event. Please try again later." });
-          } else {
-            // Get the ID of the newly inserted event
-            const event_id = result.insertId;
-
-            // Generate a unique QR code string for the event that includes the event_id
-            const qr_code_string = `${event_id}:${uuidv4()}`;
-
-            // Update the qr_code_string field in the Event table
-            connection.query(
-              "UPDATE `Event` SET `qr_code_string` = ? WHERE `event_id` = ?",
-              [qr_code_string, event_id],
-              (err, result) => {
-                connection.release();
-
-                if (err) {
-                  console.log(err);
-                  res.send({ success: false, message: "An error occurred while creating the event. Please try again later." });
-                } else {
-                  res.send({ success: true, message: "Event created successfully!", qr_code_string });
-                }
-              }
-            );
-          }
-        }
-      );
-    }
-  });
+// Error handling middleware using Winston
+app.use((err, req, res, next) => {
+  logger.error(err.stack);
+  res.status(500).json({ success: false, message: "Internal Server Error. Please try again later." });
 });
 
-app.post('/attendEvent', (req, res) => {
-  const { user_id, event_id, scanned_qr_code_string, attendance_date } = req.body;
-  res.setHeader('Content-Type', 'application/json');
-  pool.getConnection((err, connection) => {
-    if (err) {
-      console.log(err);
-      res.json({ success: false, message: "An error occurred while recording your attendance. Please try again later." });
-    } else {
-      // Check if the scanned QR code string matches the one stored in the database for the specified event
-      connection.query(
-        "SELECT `qr_code_string` FROM `Event` WHERE `event_id` = ?",
-        [event_id],
-        (err, result) => {
-          if (err) {
-            console.log(err);
-            res.json({ success: false, message: "An error occurred while recording your attendance. Please try again later." });
-          } else if (result.length === 0) {
-            res.json({ success: false, message: "The specified event does not exist." });
-          } else if (result[0].qr_code_string !== scanned_qr_code_string) {
-            res.json({ success: false, message: "The scanned QR code does not match the one for the specified event." });
-          } else {
-            // The scanned QR code string matches the one stored in the database for the specified event
-            connection.query(
-              "INSERT INTO `Attendance` (`user_id`, `event_id`, `attendance_date`) VALUES (?, ?, ?)",
-              [user_id, event_id, attendance_date],
-              (err, result) => {
-                connection.release();
-
-                if (err) {
-                  console.log(err);
-                  res.json({ success: false, message: "An error occurred while recording your attendance. Please try again later." });
-                } else {
-                  res.json({ success: true, message: "Attendance recorded successfully!" });
-                }
-              }
-            );
-          }
-        }
-      );
-    }
-  });
-});
-
-
-app.get('/getAttendance', (req, res) => {
-  const { user_id, event_id } = req.query;
-
-  pool.getConnection((err, connection) => {
-    if (err) {
-      console.log(err);
-      res.send({ success: false, message: "An error occurred while retrieving your attendance records. Please try again later." });
-    } else {
-      // Get the start and end dates of the specified event
-      connection.query(
-        "SELECT `event_start_date`, `event_end_date` FROM `Event` WHERE `event_id` = ?",
-        [event_id],
-        (err, result) => {
-          if (err) {
-            console.log(err);
-            res.send({ success: false, message: "An error occurred while retrieving your attendance records. Please try again later." });
-          } else if (result.length === 0) {
-            res.send({ success: false, message: "The specified event does not exist." });
-          } else {
-            const { event_start_date, event_end_date } = result[0];
-
-            // Get the user's attendance records for the specified event
-            connection.query(
-              "SELECT `attendance_date` FROM `Attendance` WHERE `user_id` = ? AND `event_id` = ?",
-              [user_id, event_id],
-              (err, result) => {
-                connection.release();
-
-                if (err) {
-                  console.log(err);
-                  res.send({ success: false, message: "An error occurred while retrieving your attendance records. Please try again later." });
-                } else {
-                  const attendance_dates = result.map(row => row.attendance_date);
-
-                  // Check if the user has attended all days of the event
-                  let current_date = new Date(event_start_date);
-                  let completed_attendance = true;
-                  while (current_date <= new Date(event_end_date)) {
-                    if (!attendance_dates.includes(current_date.toISOString().slice(0, 10))) {
-                      completed_attendance = false;
-                      break;
-                    }
-                    current_date.setDate(current_date.getDate() + 1);
-                  }
-
-                  res.send({ success: true, completed_attendance });
-                }
-              }
-            );
-          }
-        }
-      );
-    }
-  });
-});
 
 exports.app = functions.https.onRequest(app);
